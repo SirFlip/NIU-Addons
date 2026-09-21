@@ -27674,6 +27674,11 @@ __SCRIPTS["src/content_scripts/menu.js"] = function () {
     a.setAttribute('target', 'main');
     a.removeAttribute('title');
     li.className = '';
+    // Dynatree kennt diesen Eintrag nicht und wuerde einen Klick dem uebergeordneten Ordner zuordnen
+    // (der klappt dann zu). Deshalb die Ereignisse hier stoppen; der Link selbst oeffnet normal im Hauptframe.
+    ['click', 'dblclick', 'mousedown', 'mouseup', 'focusin', 'touchstart', 'touchend'].forEach(function (ev) {
+      a.addEventListener(ev, function (e) { e.stopPropagation(); }, false);
+    });
     if (ref) { ref.parentNode.insertBefore(li, ref.nextSibling); }
     else { template.parentNode.appendChild(li); }
     return true;
@@ -27683,7 +27688,9 @@ __SCRIPTS["src/content_scripts/menu.js"] = function () {
   (function attempt() {
     if (alreadyThere()) { return; }
     if (viaApi()) { return; }
-    if (++tries < 25) { setTimeout(attempt, 200); return; }   // Dynatree wird evtl. erst nach document_end aufgebaut
+    // Dynatree wird evtl. erst nach document_end aufgebaut: kurz warten. Ist das Seiten-jQuery gar nicht
+    // erreichbar (z. B. Userscripts auf iOS), gleich den DOM-Weg nehmen.
+    if (pw.jQuery && ++tries < 15) { setTimeout(attempt, 200); return; }
     viaDom();
   })();
 })();
