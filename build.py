@@ -67,7 +67,10 @@ def read(rel):
 
 def data_uri(path: Path):
     mime = mimetypes.guess_type(path.name)[0] or "application/octet-stream"
-    return "data:%s;base64,%s" % (mime, base64.b64encode(path.read_bytes()).decode("ascii"))
+    data = path.read_bytes()
+    if mime.startswith("image/svg") or mime.startswith("text/"):
+        data = data.replace(b"\r\n", b"\n")  # Git checkt Textdateien je Plattform mit CRLF/LF aus -> gleiches Ergebnis ueberall
+    return "data:%s;base64,%s" % (mime, base64.b64encode(data).decode("ascii"))
 
 
 def js_str(s):
