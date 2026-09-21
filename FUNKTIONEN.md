@@ -434,3 +434,9 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
 - 0.59.0.8: Sammel-Memo (P3) kodiert alle Felder als ISO-8859-1 (Zeichensatz der Memo-Seiten), Zeichen außerhalb
   werden ersetzt (€ → EUR, typografische Anführungszeichen → "); Kommando-Link „Memo“ (P16, ML3) nutzt EmployeeID +
   EmployeeNumberID, weil NIU die Dienstnummer dort nicht mehr akzeptiert.
+- Kommando-Links (P16, ML3) am 2026-09-21 gegen NIU geprüft: Mitarbeiter, Details, Urlaub, Uniform, Schlüssel, Ausbildung,
+  LV Statistik, Statistik, Dokumente laden korrekt; Memo braucht EmployeeID + EmployeeNumberID (seit 0.59.0.8 so);
+  Fahrscheingeld (`/df/fahrscheingeld/...?DienstNr=`) konnte nicht geprüft werden, das Konto hat für diesen Bereich
+  keine Berechtigung. Falls der Link für Berechtigte nicht funktioniert: melden, dann wird er auf die IDs umgestellt.
+- Test-Fixtures für Startseite, Kursdetails und Memo-Erinnerung liegen in `test/fixtures/pages.js` (Markup nach den
+  echten Seiten nachgebaut, ohne Personendaten).

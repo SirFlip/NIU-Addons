@@ -4,6 +4,7 @@ process.on('unhandledRejection', (r) => { /* Netzwerk-/IndexedDB-Rejections in j
 const { JSDOM, VirtualConsole } = require('jsdom');
 const fs = require('fs');
 const code = fs.readFileSync(__dirname + '/build-test.user.js', 'utf8');
+const pages = require('./fixtures/pages.js');
 
 const cases = [
   { url: 'https://niu.wrk.at/Kripo/Header.aspx', html: '<span id="pageTitle">NIU</span><select id="m_ddlEmployee"><option value="1">Huber (8123)</option><option value="2">Maier (7001)</option></select>',
@@ -33,16 +34,31 @@ const cases = [
       return [w.document.querySelector('#menu > li').classList.contains('open'), opened === 'mailto:?bcc=a%40example.org']; } },
   // Startseite: nur noch Kurs-Export
   { url: 'https://niu.wrk.at/Kripo/Today/Today.aspx',
-    html: '<table id="ctl00_main_m_CourseList__CourseTable"><tr><td>h</td></tr><tr><td>h2</td></tr><tr><td>K123</td><td><a class="CourseTitel" href="/Kripo/Kufer/CourseDetail.aspx?CourseID=K123">Kurs A</a></td><td>Mo, 05.10.2026 08:00</td><td>Mo, 05.10.2026 16:00</td><td>LV</td></tr></table>',
+    html: pages.todayCourses([{ nr: 'K123', titel: 'Testkurs A', von: 'Mo, 05.10.2026 08:00', bis: 'Mo, 05.10.2026 16:00', ort: 'LV' },
+                              { nr: 'K124', titel: 'Testkurs B', von: 'Di, 06.10.2026 18:00', bis: 'Di, 06.10.2026 22:00', ort: 'ABZ' }]),
     expectScripts: ['today.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
-    check: (w) => [/calendar\/render/.test(w.document.body.innerHTML), /Nottendorfergasse/.test(w.document.body.innerHTML), w.document.querySelector('#ctl00_main_m_CourseList__CourseTable a').target === 'wrk_todayDetail'] },
+    check: (w) => { const cells = w.document.querySelectorAll('td[id^=exportCal_course_]'); const html = w.document.body.innerHTML;
+      return [cells.length === 2, /Nottendorfergasse/.test(html), /location=ABZ/.test(html) || /ABZ/.test(w.document.querySelector('#exportCal_course_K124').innerHTML),
+        /Testkurs%20A|Testkurs\+A|Testkurs A/.test(w.document.querySelector('#exportCal_course_K123').innerHTML),
+        w.document.querySelectorAll('#ctl00_main_m_CourseList__CourseTable tr:first-child td').length === 2,
+        [...w.document.querySelectorAll('#ctl00_main_m_CourseList__CourseTable a.CourseTitel')].every((a) => a.target === 'wrk_todayDetail')]; } },
   { url: 'https://niu.wrk.at/Kripo/Kufer/SearchCourse.aspx',
     html: '<div id="ctl00_main_m_Options"><input id="ctl00_main_m_Options_0" type="checkbox" checked><label for="ctl00_main_m_Options_0">Nur abgeschlossene Kurse</label><input id="ctl00_main_m_Options_3" type="checkbox"><label for="ctl00_main_m_Options_3">Qualifikationen</label></div><input id="ctl00_main_m_Search" type="button">',
     expectScripts: ['SearchCourse.js', 'nur8xxx.js'], expectGlobals: ['moment'], // Fixture hat keine Kurstabelle, darf nicht werfen
     check: (w) => [w.document.getElementById('ctl00_main_m_Options_0').checked === false, w.document.getElementById('ctl00_main_m_Options_3').checked === true] },
-  { url: 'https://niu.wrk.at/Kripo/Kufer/CourseDetail.aspx?CourseID=K1', html: '<h1>Kurs</h1><h5>K1 - Test</h5><table class="MessageTable"><tr></tr><tr></tr></table>',
+  { url: 'https://niu.wrk.at/Kripo/Kufer/CourseDetail.aspx?CourseID=26999001',
+    html: pages.courseDetail([{ tag: '22.09.2026', zeit: '18:00 - 22:00', ort: 'ABZ', stock: '2', raum: '210', bez: 'Lehrsaal 210' },
+                              { tag: '29.09.2026', zeit: '18:00 - 22:00', ort: 'ABZ', stock: '2', raum: '210', bez: 'Lehrsaal 210' }]),
     expectScripts: ['CourseDetail.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
-    check: (w) => [!w.document.querySelector('#person_autocomplete')] },
+    check: (w) => { const exports = w.document.querySelectorAll('td[id^=ttt_26999001_]'); const first = exports[0] ? exports[0].innerHTML : '';
+      return [exports.length === 2, !w.document.querySelector('[id^=exportCal_]'), /calendar\/render/.test(first),
+        /20260922T1[68]00|2026-09-22|22\.09\.2026/.test(decodeURIComponent(first.replace(/\+/g, ' '))), /ABZ, 2, 210 \(Lehrsaal 210\)/.test(decodeURIComponent(first.replace(/\+/g, ' '))),
+        !w.document.querySelector('#person_autocomplete')]; } },
+  { url: 'https://niu.wrk.at/Kripo/Kufer/CourseDetail.aspx?CourseID=26999001',
+    html: pages.courseDetail([{ tag: '22.09.2026', zeit: '18:00 - 22:00', ort: 'ABZ', stock: '2', raum: '210', bez: 'Lehrsaal 210' }]),
+    expectScripts: ['CourseDetail.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
+    check: (w) => [w.document.querySelectorAll('td[id^=ttt_26999001_]').length === 1, !!w.document.querySelector('#exportCal_26999001_0_head'),
+      /Inhalte des Testkurses/.test(decodeURIComponent(w.document.querySelector('#exportCal_26999001_0_head').innerHTML.replace(/\+/g, ' ')))] },
   { url: 'https://niu.wrk.at/df/memo/Memo_last.asp?x=1',
     html: '<form></form><table id="m1"><tbody><tr><th>Memo über Test Anna (8123)</th></tr><tr><th>Autor Eins</th></tr><tr><td>Text erwähnt Autor Zwei</td></tr></tbody></table><br>' +
       '<table id="m2"><tbody><tr><th>Memo über Test Bernd (8124)</th></tr><tr><th>Autor Zwei</th></tr><tr><td>Text</td></tr></tbody></table><br>',
@@ -50,6 +66,9 @@ const cases = [
     check: (w) => [w.document.querySelectorAll('#authorfilter option').length === 3, !!w.document.querySelector('#m1 a[id^=mailButton]'), !!w.document.querySelector('#m2 a[id^=gearButton]')],
     after: async (w) => { const sel = w.document.querySelector('#authorfilter'); sel.value = 'Autor Zwei'; sel.dispatchEvent(new w.Event('change'));
       return [w.document.getElementById('m1').style.display === 'none', w.document.getElementById('m2').style.display !== 'none']; } },
+  { url: 'https://niu.wrk.at/df/memo/memo_erinnerung.asp', html: pages.memoErinnerung,
+    expectScripts: ['memo_erinnerung.js'], expectGlobals: ['PouchDB'],
+    check: (w) => [!!w.document.querySelector('#e1 a[id^=mailButton]'), !!w.document.querySelector('#e1 a[id^=gearButton]'), !w.document.querySelector('#e2 a[id^=mailButton]')] },
   { url: 'https://niu.wrk.at/df/spezialdiensterfassung/unterschreiben.asp', html: '<table><tr><th class="th">OK</th></tr></table>',
     expectScripts: ['spezialdienstUnterschreiben.js'], expectGlobals: ['jQuery'], check: (w) => [!!w.document.querySelector('button.everyone')] },
   { url: 'https://niu.wrk.at/TNG/SpezialdienstErfassung/Spezialdiensteingabe.asp', html: '<form><input name="Datum"><input name="Stundenbis"><input name="Minutenbis"><input type="checkbox" name="ListeEingabe"></form>',

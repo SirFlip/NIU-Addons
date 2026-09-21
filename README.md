@@ -52,6 +52,8 @@ Violentmonkey funktioniert gleich (Einstellungen → „Auf Updates prüfen“).
 5. NIU laden und prüfen, ob der Hinweis im Kopf erscheint. Falls nicht: im
    Userscripts-Popup nachsehen, ob das Script aktiviert ist.
 
+Installation und Updates über die Userscripts-App wurden auf dem iPhone geprüft (September 2026).
+
 **Auto-Update:** Userscripts liest `@updateURL` und `@downloadURL`. Beim Öffnen
 des Userscripts-Popups in Safari erscheint oben ein Hinweis, wenn eine neuere
 Version vorliegt, ein Tipp auf **Update** installiert sie. Eine stille

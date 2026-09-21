@@ -89,6 +89,11 @@ $(document).ready(function() {
         course.Termine.push(termin);
       }
 
+      // "Sonstiges" als Beschreibung an alle Termine (auch für den Export unter der Überschrift)
+      if (course.Sonstiges) {
+        course.Termine.forEach(function(termin) { termin.beschreibung = course.Sonstiges; });
+      }
+
       // Termin export unter der Überschrift für single event Termine
       if (course.Termine.length == 1) {
         var headTermin = $.extend({}, course.Termine[0]);
@@ -102,9 +107,6 @@ $(document).ready(function() {
 
       // Termin export in die Termintabelle
       course.Termine.forEach(function(termin) {
-        if (course.Sonstiges) {
-          termin.beschreibung = course.Sonstiges;
-        }
         var cal = createCalElement(termin);
         $('#termin_' + termin.id).append('<td id="ttt_' + termin.id + '" class="MessageBodyLeftBorder"></td>');
         $('#ttt_' + termin.id).append(cal);
