@@ -42,7 +42,7 @@ var __RES = {
   "img/sort_desc.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAYAAAByUDbMAAAAZUlEQVQ4y2NgGAWjYBSggaqGu5FA/BOIv2PBIPFEUgxjB+IdQPwfC94HxLykus4GiD+hGfQOiB3J8SojEE9EM2wuSJzcsFMG4ttQgx4DsRalkZENxL+AuJQaMcsGxBOAmGvopk8AVz1sLZgg0bsAAAAASUVORK5CYII=",
   "img/sort_desc_disabled.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABMAAAATCAQAAADYWf5HAAAAWUlEQVQoz2NgGAWDCtyJvPPzznc4/HknEbsy9js77vyHw313eHGZZ3PnE1TRuzuOuK1lvDMRqmzuHUZ87lO+cxuo6PEdLUIeyb7z604pYf+y3Zlwh4u2YQoAc7ZCBHH4jigAAAAASUVORK5CYII=",
   "img/vcf32.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAzgAAAM4BlP6ToAAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAALVSURBVFiFzZdLSFVRFIa/PyXtjaQpNSgiiRCih0WhKBQRRUlUZNHAUWDjCIJsEESNmkTRA4OmveiB5eASCTXrNVGIsiBskEZRaiF4aTXY++Lp3HPvPfd60X5Y7LPXWWet/+x91lr7YGYEBWgCBgGbhJwJ+80kpaTjANAHtEbci4NO4KSkATO7mss4ikApMGRmPYVElzTqLy9J+mxmj7LZzygkSEyUADclrZ8uAgBzgC5JS6eLAEAN0C2pYroIAKwC7kmaORUERjLom4ETYWVUFqRBUiNQGZPADeA5rh68Aca9/hiwOG8CksqAdcCtmARSKAOazey293MwyijOCggYNrMvkhqAU8B5M0t4x4eBqtAzH4AEMbY41hYEsAPYDrz3AQAe4nI+iHFiIl8Cr/z4OqDbD1SH7N4Bj4tKQNJa4Liftkl6YWa9wEtcwQnie1y/+aThOWCzv24GrvvrMqA8JGn5ngn5bEG4ptf5sR5X7VK4Y2a9ksqLTWAlsAGoxX3lfQBmdiUPHwURSAIrgBY/H8V9dNWScvn+NGkCZpYEOnLSLBBT1Yz+XwKZtqBR0v0ix6oHuuISWIL70L4Bs4F5Xj8K/AIWBp796qXW64ZCviqZKNUWDpRtC8aB5cChgK4NlxHjwFugwcwWmVkd7tAxbGY1QQH6A8+npU22LJiFaz7dwJgnm8Cl4x9gN/Bb0jXcv0TqNIykdqDdT5dliZEzDfea2V1JPUCJmY1IagWemFm/pLPAkYD9Tz8mPWnhSnVG5MqCXf4c9xRISFrARDuGid6QggGYWaeZbcL1jKzIRWA+sBV45knswb1Rrb//IGQvAEkdksaAH7kIxCnF+4CjuH0/7XU7Ja0GLgIfgS3AXNzZIOU369KnEKcQteA630ZgWyBAjyc2AFzGnQtKJK3h3+6YFVErkAzNq3Cn2zAqgAsR+ijbTL5J+12mOL/nUTIINIXj/QWgexN0DU4LwQAAAABJRU5ErkJggg==",
-  "src/webcontent/employee_dump_menu.html": "<ul id=\"menu\">\n  <li><div class=\"menu-title\">Funktionen &#9662;</div>\n    <ul>\n      <li class=\"menu-header\">Ausbildungen</li>\n      <li><div id=\"grundkurse\">Grundkurse pr&uuml;fen</div></li>\n      <li><div id=\"ampel\">SAN-Ampeln pr&uuml;fen</div></li>\n      <li class=\"menu-header\">Berechtigungen</li>\n      <li><div id=\"alleber\">Alle Berechtigungen</div></li>\n      <li><div id=\"sanber\">SAN-Berechtigung</div></li>\n      <li><div id=\"fsdber\">FSD-Berechtigung</div></li>\n      <li><div id=\"fahrber\">Fahrer-Berechtigung</div></li>\n      <li class=\"menu-header\">Verwaltung</li>\n      <li><div id=\"dienstgrade\">Dienstgrade auswerten</div></li>\n      <li><div id=\"gaststatus\">Gaststatus auswerten</div></li>\n      <li><div id=\"fotofehlt\">Fehlende MA-Fotos auswerten</div></li>\n      <li><div id=\"shortcuts\">Kommando einblenden</div></li>\n      <li><div id=\"keys\">Ausgegebene / Eingezogene Schl&uuml;ssel einblenden</div></li>\n      <li class=\"menu-header\">EDV</li>\n      <li><div id=\"niuzugang\">AD Benutzer auswerten</div></li>\n    </ul>\n  </li>\n</ul>\n"
+  "src/webcontent/employee_dump_menu.html": "<ul id=\"menu\">\n  <li><div class=\"menu-title\">Funktionen &#9662;</div>\n    <ul>\n      <li class=\"menu-header\">Ausbildungen</li>\n      <li><div id=\"grundkurse\">Grundkurse pr&uuml;fen</div></li>\n      <li><div id=\"ampel\">SAN-Ampeln pr&uuml;fen</div></li>\n      <li class=\"menu-header\">Berechtigungen</li>\n      <li><div id=\"alleber\">Alle Berechtigungen</div></li>\n      <li><div id=\"sanber\">SAN-Berechtigung</div></li>\n      <li><div id=\"fsdber\">FSD-Berechtigung</div></li>\n      <li><div id=\"fahrber\">Fahrer-Berechtigung</div></li>\n      <li class=\"menu-header\">Verwaltung</li>\n      <li><div id=\"dienstgrade\">Dienstgrade auswerten</div></li>\n      <li><div id=\"gaststatus\">Gaststatus auswerten</div></li>\n      <li><div id=\"fotofehlt\">Fehlende MA-Fotos auswerten</div></li>\n      <li><div id=\"shortcuts\">Kommando einblenden</div></li>\n      <li class=\"menu-header\">EDV</li>\n      <li><div id=\"niuzugang\">AD Benutzer auswerten</div></li>\n    </ul>\n  </li>\n</ul>\n"
 };
 
 // ---------------------------------------------------------------------------
@@ -752,89 +752,6 @@ function checkCourseAttendanceNotCached(args) {
       });
     });
   });
-}
-
-async function getKeyInfo(eid) {
-  var keys = [];
-  var baseurl = NIU_BASE + "/Kripo/Employee/IssuedKeys.aspx?EmployeeId=";
-  var statustable = "<table><thead><tr><th>Typ</th><th>ID</th><th>Ausgegeben am: </th><th>Eingezogen am: </th><th>Ausgegeben durch: </th></tr><thead><tbdoy>";
-
-  var data = await $.ajax(
-    {
-      url: baseurl + eid,
-      type: 'GET'
-    }
-  );
-
-  var keysarray = [];
-  var keytable = $(data).find(".standard");
-  var keyrows = $(keytable).find("tr");
-  keyrows = keyrows.slice(0);
-
-  for (i = 1; i <= keyrows.length - 1; i++) {
-
-    var keydata = $(keyrows[i]).find("td");
-    var keytype = null;
-    var keyid = null;
-    if (isNaN($(keydata[2]).html())) {
-      if ($(keydata[2]).html().includes("BegehCard") === true || $(keydata[2]).html().includes("Begehcard") === true){
-        keytype = "BegehCard";
-        keyid = $(keydata[2]).html().substr(10);
-      }
-      else if($(keydata[2]).html().includes("Begeh Card") === true  || $(keydata[2]).html().includes("BEGEH CARD") === true ) {
-        keytype = "BegehCard";
-        keyid = $(keydata[2]).html().substr(11);
-      } else if ($(keydata[2]).html().includes("WEZ2000neu")) {
-        keytype = "WEZ Neu";
-        keyid = $(keydata[2]).html().substr(11);
-      } else if ($(keydata[2]).html().includes("WEZ 2000neu") || $(keydata[2]).html().includes("WEZ 2000NEU") || $(keydata[2]).html().includes("WEZ 2000Neu")) {
-        keytype = "WEZ Neu";
-        keyid = $(keydata[2]).html().substr(12);
-      } else if ($(keydata[2]).html().includes("CHS-Schlüssel") || $(keydata[2]).html().includes("CHS")) {
-        keytype = "CHS-Schlüsel";
-        keyid = "";  
-      } else if ($(keydata[2]).html().includes("Transponder rot KHD")) {
-        keytype = "Transponder KHD rot";
-        keyid = "";
-      } else if ($(keydata[2]).html().includes("Transponder rot ABZ")) {
-        keytype = "Transponder ABZ rot";
-        keyid = "";
-      } else if ($(keydata[2]).html().includes("Spindschlüssel")) {
-        keytype = "Spind";
-        keyid = $(keydata[2]).html().substr(16);
-      } else if ($(keydata[2]).html().includes("Spind")) {
-        keytype = "Spind";
-        keyid = $(keydata[2]).html().substr(6);
-      } else if ($(keydata[2]).html().includes("WEZ2000") && !$(keydata[2]).html().includes("WEZ2000neu") && !$(keydata[2]).html().includes("WEZ 2000neu") ){
-        keytype = "WEZ2000";
-        keyid = $(keydata[2]).html().substr(8);
-      } else if ($(keydata[2]).html().includes("WEZ 2000")  && !$(keydata[2]).html().includes("WEZ2000neu") && !$(keydata[2]).html().includes("WEZ 2000neu") ) {
-        keytype = "WEZ2000";
-        keyid = $(keydata[2]).html().substr(9);
-      } else if ($(keydata[2]).html().includes("2000er")) {
-        keytype = "WEZ2000";
-        keyid = $(keydata[2]).html().substr(6);
-      } else {
-        keytype = "Sonstiger";
-        keyid = $(keydata[2]).html();
-      }
-    } else {
-      keytype = "Transponder";
-      keyid = $(keydata[2]).html();
-    }
-    var key = {
-      "key_type": keytype,
-      "key_id": keyid,
-      "issued_at": $(keydata[0]).html(),
-      "revoked_at": $(keydata[1]).html(),
-      "issued_by": $(keydata[3]).html()
-    };
-    console.log
-    keys.push(key);
-    statustable += "<tr><td>" + key.key_type + "</td><td>" + key.key_id + "</td><td>" + key.issued_at + "</td><td>" + key.revoked_at + "</td><td>" + key.issued_by + "</td></tr>";
-  }
-  statustable += "</tbody></table>";
-  return statustable;  
 }
 
 // Basis-URL von NIU: im Userscript der aktuelle Host, in der Extension fest
@@ -27635,10 +27552,6 @@ $(document).ready(function() {
 
     addCalculationHandler("#shortcuts", [{calcname : "shortcuts", uiname : "Kommando"}], function(dnr, name) {
         return dnrToIdentifier(dnr).then(function(result) { return kommandoLinks(dnr, result); });
-    });
-
-    addCalculationHandler("#keys", [{calcname: "keys", uiname: "Ausgegebene / Eingezogene Schlüssel"}], function(dnr, name){
-      return dnrToIdentifier(dnr).then(function(result) { return getKeyInfo(result.EID); });
     });
 
     // ---- EDV

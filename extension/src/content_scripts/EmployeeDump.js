@@ -378,10 +378,6 @@ $(document).ready(function() {
         return dnrToIdentifier(dnr).then(function(result) { return kommandoLinks(dnr, result); });
     });
 
-    addCalculationHandler("#keys", [{calcname: "keys", uiname: "Ausgegebene / Eingezogene Schlüssel"}], function(dnr, name){
-      return dnrToIdentifier(dnr).then(function(result) { return getKeyInfo(result.EID); });
-    });
-
     // ---- EDV
     datasheetColumn("#niuzugang", "niuzugang", "AD-Benutzer", function(result) { return result.ADuser; });
   });

@@ -92,8 +92,8 @@ def patch_source(rel, text):
     """Kleine, gezielte Anpassungen am Original-Code."""
     if rel == "src/content_scripts/lib/staff-lib.js":
         n = text.count('"https://niu.wrk.at/')
-        if n != 8:
-            raise SystemExit("staff-lib.js: %d statt 8 NIU-URLs gefunden - Patch prüfen" % n)
+        if n != 7:
+            raise SystemExit("staff-lib.js: %d statt 7 NIU-URLs gefunden - Patch prüfen" % n)
         text = text.replace('"https://niu.wrk.at/', 'NIU_BASE + "/')
     # <img src=" + getURL(..) + " width=..>  ->  Attribut in Hochkommas (data:-URIs!)
     text = re.sub(r"""<img src=" \+ (chrome\.extension\.getURL\('[^']+'\)) \+ " width""",

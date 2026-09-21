@@ -188,7 +188,7 @@ Menü → Verwaltung / EDV:
 | P14 | Gaststatus auswerten | ja/nein | `detailEmployee.aspx` | OK | **behalten** |
 | P15 | Fehlende MA-Fotos auswerten | Foto-URL enthält „unknown“ | `detailEmployee.aspx` | OK | **behalten** |
 | P16 | Kommando einblenden | 11 Deep-Links je Person (Details, Urlaub, Fahrscheingeld, Uniform, Schlüssel, Memo, Ausbildung, LV-Statistik, Statistik, Dokumente) | `ControlCenterHead` (nur IDs) | OK, Linkliste dreifach dupliziert (auch memo_last, memo_erinnerung) | **behalten** |
-| P17 | Ausgegebene/Eingezogene Schlüssel | Tabelle aus `IssuedKeys.aspx`, Klassifizierung per Textheuristik (BegehCard, WEZ, CHS, Transponder, Spind) | `IssuedKeys.aspx` | FRAGIL (feste Substring-Offsets) | **behalten** |
+| P17 | Ausgegebene/Eingezogene Schlüssel | Tabelle aus `IssuedKeys.aspx`, Klassifizierung per Textheuristik (BegehCard, WEZ, CHS, Transponder, Spind) | `IssuedKeys.aspx` | FRAGIL (feste Substring-Offsets) | **weg** (entfernt in 0.59.0.4) |
 | P18 | AD Benutzer auswerten | Zelle mit „Wrk.at“ | `detailEmployee.aspx` | OK | **behalten** |
 | P19 | „Die nächste freie Dienstnummer lautet …“ | Läuft automatisch, liest Zeichen 15–18 des Suchparameter-Texts, nur richtig wenn nach DNr sortiert | DOM | FRAGIL, redundant zu N1 | **weg** (fragil, N1 macht dasselbe) |
 
@@ -381,7 +381,7 @@ mehr gebraucht.
 | SearchCourse.js: K1–K4 | Kurssuche mit Autosuche, Tabelle und Vorfiltern |
 | CourseDetail.js: C4 | Kalender-Export je Kurstermin |
 | LVStatistic.js (L1) | wird aktiv genutzt, im September 2026 angepasst, Test vorhanden |
-| EmployeeDump.js: P1–P3, P8, P10, P12–P18 | Mitarbeiter-Verwaltung: Grundkurse, Ampel, Berechtigungen, Schlüssel, Stammdaten, Sammel-Mail/-Memo |
+| EmployeeDump.js: P1–P3, P8, P10, P12–P16, P18 | Mitarbeiter-Verwaltung: Grundkurse, Ampel, Berechtigungen, Stammdaten, Sammel-Mail/-Memo (P17 Schlüssel seit 0.59.0.4 weg) |
 | detailEmployee.js: M1, M2 | Dekret-Hinweis und Adress-Kopierbox |
 | shortemployee.js, summaryemployee.js (V1–V3) | VCF-Download der Mitarbeiterseiten |
 | memo_last.js, memo_erinnerung.js (ML1–ML3) | Memos gehören zur Mitarbeiter-Verwaltung |

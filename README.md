@@ -84,7 +84,7 @@ zugehörigen Funktionen wurden entfernt.
 - **LV-Statistik:** Zusatztabelle gruppiert nach Dienstart und Funktion.
 - **Mitarbeiter Liste/Ausdruck:** sortierbare Tabelle mit Filter je Spalte,
   Auswertungsspalten (Grundkurse, SAN-Ampel, Berechtigungen, Dienstgrad,
-  Gaststatus, fehlendes Foto, Schlüssel, AD-Benutzer, Kommando-Links),
+  Gaststatus, fehlendes Foto, AD-Benutzer, Kommando-Links),
   Sammel-Mail und Sammel-Memo für ausgewählte Zeilen.
 - **Mitarbeiter Detail:** Hinweis auf nicht ausgefolgte Dekrete, Kopierbox für
   Name und Anschrift.
