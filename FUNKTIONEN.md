@@ -427,3 +427,5 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
   Liste/Ausdruck; Auswertungsspalten in Liste/Ausdruck fragen NIU mit höchstens 4 gleichzeitigen Requests ab;
   Dekret-Hinweis hat einen Fallback für geänderte Verschachtelung; Kurssuche bricht bei unerwarteter Spaltenzahl nicht
   mehr ab; GitHub-Workflow baut und testet bei jedem Push.
+- Neu in 0.59.0.5: Sidebar-Eintrag „Kurssuche (NIU)“ unter „Ausbildung“ (`menu.js`, über die Dynatree-API der Seite,
+  Fallback DOM-Eintrag mit `target="main"`); Kurssuche wählt „Nur abgeschlossene Kurse“ beim ersten Aufruf ab.

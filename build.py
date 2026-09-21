@@ -29,7 +29,7 @@ US = ROOT / "userscript"
 OUT = ROOT / "dist" / "niu-little-helper.user.js"
 
 # Userscript-Version = Extension-Version + eigener Zähler
-US_REVISION = 4
+US_REVISION = 5
 
 # Globale Namen, die die Bibliotheken bereitstellen und die die Content-Scripts
 # als nackte Bezeichner verwenden.
@@ -186,6 +186,7 @@ def main():
         ("grant", "GM_addStyle"),
         ("grant", "GM_registerMenuCommand"),
         ("grant", "GM_openInTab"),
+        ("grant", "unsafeWindow"),
     ]
     for k, v in meta:
         w("// @%-12s %s" % (k, v))

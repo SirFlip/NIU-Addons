@@ -77,7 +77,7 @@ Verwendung sind. Dienstplan und Ambulanzen laufen in einem anderen System, die
 zugehörigen Funktionen wurden entfernt.
 
 - **Startseite:** Kalender-Export je Kurs (Google, iCal, Outlook).
-- **Kurssuche:** automatische Suche über die nächsten 12 Monate, sortierbare
+- **Kurssuche:** „Nur abgeschlossene Kurse“ beim Aufruf abgewählt, automatische Suche über die nächsten 12 Monate, sortierbare
   Tabelle mit Volltextsuche, Vorfilter (freie Plätze, §50/§51, SAN-Basiskurse,
   FSD, KHD, FKR, Pflichtfortbildungen), Kursauswahl und Suchformular ausblendbar.
 - **Kursdetails:** Kalender-Export je Termin.
@@ -91,6 +91,7 @@ zugehörigen Funktionen wurden entfernt.
 - **Mitarbeiter kurz/Zusammenfassung:** VCF- und Foto-Download.
 - **Memos:** Autor-Filter, Mail-Icon und Kommando-Links je Memo.
 - **Spezialdienste:** Eingabeformular vorbefüllen, „alle OK“ beim Unterschreiben.
+- **Sidebar:** Eintrag „Kurssuche (NIU)“ unter „Ausbildung“, weil NIU dort nur noch die MPO-Kurssuche verlinkt.
 - **Überall:** Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown (Nummernkreis in den Einstellungen wählbar), Einstellungen im NIU-Kopf.
 
 Das vollständige Inventar mit allem, was es vor dem Rückbau gab, steht in

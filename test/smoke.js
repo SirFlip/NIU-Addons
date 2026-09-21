@@ -52,6 +52,14 @@ const cases = [
   { url: 'https://niu.wrk.at/Kripo/Header.aspx#niu-helper-settings', html: '<span id="pageTitle">NIU</span>',
     expectScripts: ['Header.js', 'header-extras.js', 'nur8xxx.js', 'settings.js'], expectGlobals: [],
     check: (w) => [w.document.title.includes('Einstellungen'), w.document.querySelectorAll('input').length === 3, w.document.querySelectorAll('select').length === 1] },
+  { url: 'https://niu.wrk.at/Kripo/menu.aspx',
+    html: '<div id="_Tree"><ul class="dynatree-container"><li><span class="dynatree-node"><a href="#" class="dynatree-title">Ausbildung</a></span><ul>' +
+      '<li><span class="dynatree-node"><span class="dynatree-connector"></span><a href="https://portal.wrk.at/mpo/training/courses" class="dynatree-title">Kurssuche im MPO</a></span></li>' +
+      '<li><span class="dynatree-node"><span class="dynatree-connector"></span><a href="/Kripo/Kufer/lecturer.aspx" class="dynatree-title">Dozenten</a></span></li></ul></li></ul></div>',
+    expectScripts: ['menu.js', 'nur8xxx.js'], expectGlobals: [], waitMs: 5600,
+    check: (w) => { const as = [...w.document.querySelectorAll('#_Tree a.dynatree-title')].map((a) => a.textContent.trim());
+      const a = w.document.querySelector('#_Tree a[href="/Kripo/Kufer/SearchCourse.aspx"]');
+      return [JSON.stringify(as) === JSON.stringify(['Ausbildung', 'Kurssuche im MPO', 'Kurssuche (NIU)', 'Dozenten']), !!a && a.target === 'main']; } },
   { url: 'https://niu.wrk.at/irgendwas/anderes.aspx', html: '', expectScripts: [], expectGlobals: [] },
 ];
 
@@ -71,7 +79,7 @@ const cases = [
     w.__NIU_HELPER_TEST__ = (p) => { probe = p; };
     const fidb = require('fake-indexeddb'); w.indexedDB = new fidb.IDBFactory(); w.IDBKeyRange = fidb.IDBKeyRange;
     try { w.eval(code); } catch (e) { errors.push('THROW: ' + e.stack); }
-    await new Promise((r) => setTimeout(r, 400));
+    await new Promise((r) => setTimeout(r, c.waitMs || 400));
 
     const active = (logs.find((l) => l.includes('aktiv:')) || '').split('aktiv: ')[1] || '';
     const got = active ? active.split(', ').sort() : [];

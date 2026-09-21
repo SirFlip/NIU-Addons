@@ -68,6 +68,10 @@ Aufbau der gebauten Datei (alles in einer IIFE, gemeinsamer Scope wie bei Conten
 **bricht ab, wenn es nicht exakt 8 Vorkommen sind**. Wer Funktionen aus staff-lib entfernt, muss den Zähler anpassen.
 `lib.js` hat eine weitere feste `niu.wrk.at`-URL (shortemployee), die nicht gepatcht wird.
 
+NIU ist ein Frameset (`/Kripo/`): Frames `header` (Header.aspx), `menu` (menu.aspx, Dynatree-Sidebar) und `main`.
+`menu.js` greift über `unsafeWindow.jQuery` auf die Dynatree-API der Seite zu (Header `@grant unsafeWindow`); das
+gebündelte jQuery kennt das Plugin nicht.
+
 Die Content-Scripts sind jQuery-Code, der NIU-Seiten (ASP.NET WebForms) per DOM-Scraping erweitert. `staff-lib.js`
 kapselt die NIU-Abfragen (GET + simulierte Postbacks mit gescrapten `__EVENTVALIDATION`-Tokens) hinter einem
 PouchDB-Cache (`getFromCache`, DB `niuhelperdb1`, 24 h). Cache-Nutzer sind `EmployeeDump.js` (Liste/Ausdruck,
