@@ -171,7 +171,10 @@ def main():
         ("version", version),
         ("description", "Userscript-Portierung der Chrome-Erweiterung NIU's little helper (Wiener Rotes Kreuz, NIU) inkl. Filter 'nur 8xxx' im Mitarbeiter-Dropdown."),
         ("author", "Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes"),
-        ("homepageURL", "https://github.com/geraldbaeck/NIUsLittleHelper"),
+        ("homepageURL", "https://github.com/SirFlip/NIU-Addons"),
+        ("supportURL", "https://github.com/SirFlip/NIU-Addons/issues"),
+        ("updateURL", "https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js"),
+        ("downloadURL", "https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js"),
         ("match", "*://niu/*"),
         ("match", "*://niu.wrk.at/*"),
         ("match", "*://intranet.wrk.at/confluence/display/VFM/Bescheiderstellung*"),
@@ -191,7 +194,9 @@ def main():
     w("")
     w("// AUTOMATISCH ERZEUGT von build.py - nicht von Hand ändern, sondern die")
     w("// Quellen in extension/ bzw. userscript/ anpassen und neu bauen.")
-    w("// Original-Extension: public domain (Unlicense), siehe homepageURL.")
+    w("// Original-Extension \"NIU's little helper\" von Gerald Baeck, Sebastian Kuttnig,")
+    w("// Stephan Spindler, Daniel Steiner et al.: https://github.com/geraldbaeck/NIUsLittleHelper")
+    w("// Lizenz des Originals und dieser Portierung: public domain (Unlicense), siehe UNLICENSE im Repo.")
     w("// Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).")
     w("")
     w("(function () {")

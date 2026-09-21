@@ -4,7 +4,10 @@
 // @version      0.58.3.2
 // @description  Userscript-Portierung der Chrome-Erweiterung NIU's little helper (Wiener Rotes Kreuz, NIU) inkl. Filter 'nur 8xxx' im Mitarbeiter-Dropdown.
 // @author       Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes
-// @homepageURL  https://github.com/geraldbaeck/NIUsLittleHelper
+// @homepageURL  https://github.com/SirFlip/NIU-Addons
+// @supportURL   https://github.com/SirFlip/NIU-Addons/issues
+// @updateURL    https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js
+// @downloadURL  https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js
 // @match        *://niu/*
 // @match        *://niu.wrk.at/*
 // @match        *://intranet.wrk.at/confluence/display/VFM/Bescheiderstellung*
@@ -21,7 +24,9 @@
 
 // AUTOMATISCH ERZEUGT von build.py - nicht von Hand ändern, sondern die
 // Quellen in extension/ bzw. userscript/ anpassen und neu bauen.
-// Original-Extension: public domain (Unlicense), siehe homepageURL.
+// Original-Extension "NIU's little helper" von Gerald Baeck, Sebastian Kuttnig,
+// Stephan Spindler, Daniel Steiner et al.: https://github.com/geraldbaeck/NIUsLittleHelper
+// Lizenz des Originals und dieser Portierung: public domain (Unlicense), siehe UNLICENSE im Repo.
 // Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).
 
 (function () {

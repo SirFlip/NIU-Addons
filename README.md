@@ -1,9 +1,48 @@
 # NIU's little helper – Userscript-Build
 
-Macht aus der Chrome-Extension (Ordner `extension/`, Stand: Hannes-Version =
-upstream `bd58b69` + eigene Änderungen) **eine** Datei
-`dist/niu-little-helper.user.js` für Tampermonkey, Violentmonkey und
+## Installation
+
+Die fertige Datei liegt bei jedem Release unter
+<https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js>.
+
+**Desktop (Chrome, Edge, Firefox) mit Tampermonkey oder Violentmonkey**
+
+1. Tampermonkey aus dem Store des Browsers installieren.
+2. Den Link oben öffnen. Tampermonkey zeigt die Installationsseite, dort „Installieren“ klicken.
+3. Updates holt Tampermonkey automatisch über die im Script eingetragene `@updateURL`.
+
+**iPhone / iPad / Mac Safari mit „Userscripts“**
+
+1. App „Userscripts“ (quoid) aus dem App Store installieren und in Safari als Erweiterung aktivieren.
+2. Den Link oben in Safari öffnen. Das Userscripts-Symbol in der Adressleiste antippen, dort erscheint das Script zur Installation.
+   Alternativ die Datei in den Userscripts-Ordner in „Dateien“ legen.
+3. Beim ersten Aufruf von NIU im Userscripts-Menü die Erweiterung für `niu.wrk.at` erlauben.
+
+**Einstellungen** erreichst du im NIU-Kopf über „⚙ Einstellungen“ oder das Tampermonkey-Menü.
+
+## Was das Tool kann
+
+Siehe [FUNKTIONEN.md](FUNKTIONEN.md) für das vollständige Inventar aller Funktionen mit Zustand und Abhängigkeiten.
+
+## Herkunft und Lizenz
+
+Dieses Repo ist eine Userscript-Portierung der Chrome-Erweiterung
+**„NIU's little helper“** von Gerald Bäck, Sebastian Kuttnig, Stephan Spindler,
+Daniel Steiner und weiteren Mitwirkenden:
+<https://github.com/geraldbaeck/NIUsLittleHelper>
+
+Der Ordner `extension/` enthält die Original-Extension (Stand upstream `bd58b69`
+plus eigene Änderungen, siehe Tabelle unten). `build.py` macht daraus **eine**
+Datei `dist/niu-little-helper.user.js` für Tampermonkey, Violentmonkey und
 Userscripts (Safari/iOS).
+
+Das Original ist als **Unlicense** (public domain) veröffentlicht. Diese
+Portierung steht unter derselben Lizenz, siehe [UNLICENSE](UNLICENSE).
+Die eingebetteten Fremdbibliotheken (jQuery, jQuery UI, PouchDB, moment,
+DataTables, SheetJS, docxtemplater, JSZip, FileSaver, Chartist, vex, PNotify,
+ClipboardJS, jquery-modal, spin.js, ouical, ics.js) unterliegen ihren eigenen
+Lizenzen; die Lizenz-Header bleiben in der gebauten Datei erhalten.
+NIU selbst ist Eigentum des Österreichischen Roten Kreuzes.
 
 ## Bauen
 
