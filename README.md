@@ -72,7 +72,29 @@ Die Adresse `releases/latest/download/…` zeigt danach automatisch auf das neue
 
 ## Was das Tool kann
 
-Siehe [FUNKTIONEN.md](FUNKTIONEN.md) für das vollständige Inventar aller Funktionen mit Zustand und Abhängigkeiten.
+Seit Version 0.59 ist das Addon auf die Teile von NIU reduziert, die noch in
+Verwendung sind. Dienstplan und Ambulanzen laufen in einem anderen System, die
+zugehörigen Funktionen wurden entfernt.
+
+- **Startseite:** Kalender-Export je Kurs (Google, iCal, Outlook).
+- **Kurssuche:** automatische Suche über die nächsten 12 Monate, sortierbare
+  Tabelle mit Volltextsuche, Vorfilter (freie Plätze, §50/§51, SAN-Basiskurse,
+  FSD, KHD, FKR, Pflichtfortbildungen), Kursauswahl und Suchformular ausblendbar.
+- **Kursdetails:** Kalender-Export je Termin.
+- **LV-Statistik:** Zusatztabelle gruppiert nach Dienstart und Funktion.
+- **Mitarbeiter Liste/Ausdruck:** sortierbare Tabelle mit Filter je Spalte,
+  Auswertungsspalten (Grundkurse, SAN-Ampel, Berechtigungen, Dienstgrad,
+  Gaststatus, fehlendes Foto, Schlüssel, AD-Benutzer, Kommando-Links),
+  Sammel-Mail und Sammel-Memo für ausgewählte Zeilen.
+- **Mitarbeiter Detail:** Hinweis auf nicht ausgefolgte Dekrete, Kopierbox für
+  Name und Anschrift.
+- **Mitarbeiter kurz/Zusammenfassung:** VCF- und Foto-Download.
+- **Memos:** Autor-Filter, Mail-Icon und Kommando-Links je Memo.
+- **Spezialdienste:** Eingabeformular vorbefüllen, „alle OK“ beim Unterschreiben.
+- **Überall:** Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown, Einstellungen im NIU-Kopf.
+
+Das vollständige Inventar mit allem, was es vor dem Rückbau gab, steht in
+[FUNKTIONEN.md](FUNKTIONEN.md).
 
 ## Herkunft und Lizenz
 
@@ -114,8 +136,11 @@ Braucht nur Python 3. Version hochzählen: `US_REVISION` in `build.py`.
 | fehlende Sortierpfeile der DataTables (`../images/` gab es nie) | aus `img/sort_*.png` eingebettet |
 | `LVStatistic.js`: Gruppenzeilen per `#id_<Gruppe>_<Funktion>` gesucht – Funktionen mit Leerzeichen blieben 0, „i.A.“ warf einen Selektor-Fehler und brach die Schleife ab | Zeilen werden direkt referenziert; Dauer wird per Regex geparst; Gruppen sortiert mit „gesamt“-Zeile |
 | `LVStatistic.js`: Muster für alte Dienstart-Namen (RKL/RKS …) | zusätzlich `RTW`/`NAW` → RTW, `LS` → neue Gruppe Leitstelle, `Öffentlichkeitsarbeit` → Sonstiges (heutige Namen wie „RD RTW Mittel ND“) |
+| Menü in Liste/Ausdruck mit jQuery UI | reines CSS-Menü, jQuery UI entfällt |
 
 Neu dabei: `userscript/nur8xxx.js` (Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown).
+Entfernt (siehe FUNKTIONEN.md): Dienstplan, Ambulanzen, Dienststatistik, Kursan-/abmeldung,
+Word-Vorlagen, Mitarbeiter Neu, Confluence-Erweiterungen.
 
 Bibliotheken werden erst ausgeführt, wenn die aktuelle Seite sie laut
 `manifest.json` braucht – deshalb darf das Skript auf dem ganzen NIU-Host laufen.

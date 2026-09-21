@@ -1,4 +1,8 @@
-﻿# NIU's little helper
+> **Hinweis:** Dieses README beschreibt die Original-Extension. Im Rahmen der Userscript-Portierung
+> (siehe ../README.md und ../FUNKTIONEN.md) wurden Dienstplan, Ambulanzen, Dienststatistik,
+> Kursanmeldung, Word-Vorlagen, Mitarbeiter Neu und die Confluence-Erweiterungen entfernt.
+
+# NIU's little helper
 Chrome Erweiterung zur einfacheren Bedienung des internen Verwaltungssystems des Wiener Roten Kreuz ([NIU](https://niu.wrk.at/)).
 
 ## Installation

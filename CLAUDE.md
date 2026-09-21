@@ -8,10 +8,11 @@ Userscript-Portierung der Chrome-Extension „NIU's little helper“ (Wiener Rot
 Upstream: https://github.com/geraldbaeck/NIUsLittleHelper (Unlicense). Verweise auf das Original und die Lizenz
 in README, `build.py`-Header und Release-Notizen müssen erhalten bleiben.
 
-NIU wird schrittweise abgelöst; laufendes Ziel ist der Rückbau nicht mehr benötigter Funktionen.
-`FUNKTIONEN.md` ist das Inventar aller Funktionen mit IDs (D1, P4, K5 …), Zustand, Abhängigkeiten und der
-Spalte „Entscheidung“. Beim Entfernen von Features diese IDs verwenden und Abschnitt 4 (welche
-Fremdbibliothek mit welchem Feature entfällt) beachten.
+NIU wird schrittweise abgelöst. Der große Rückbau (Dienstplan, Ambulanzen, Dienststatistik, Kursanmeldung,
+Word-Vorlagen, Mitarbeiter Neu, Confluence) ist mit 0.59.0 umgesetzt. `FUNKTIONEN.md` ist das Inventar aller
+Funktionen mit IDs (D1, P4, K5 …), Zustand, Abhängigkeiten und der Entscheidung; Abschnitt 8 zeigt, was
+entfernt wurde, Abschnitt 9 die offenen To-dos. Bei weiteren Streichungen die IDs verwenden und Abschnitt 4
+(welche Fremdbibliothek mit welchem Feature entfällt) beachten.
 
 ## Befehle
 
@@ -62,13 +63,15 @@ Aufbau der gebauten Datei (alles in einer IIFE, gemeinsamer Scope wie bei Conten
    `userscript/` an (Einstellungsseite `Header.aspx#niu-helper-settings`, Settings-Link, „nur 8xxx“).
 
 `patch_source()` in `build.py` schreibt in `staff-lib.js` alle `"https://niu.wrk.at/` auf `NIU_BASE + "/` um und
-**bricht ab, wenn es nicht exakt 17 Vorkommen sind**. Wer Funktionen aus staff-lib entfernt, muss den Zähler anpassen.
+**bricht ab, wenn es nicht exakt 8 Vorkommen sind**. Wer Funktionen aus staff-lib entfernt, muss den Zähler anpassen.
 `lib.js` hat eine weitere feste `niu.wrk.at`-URL (shortemployee), die nicht gepatcht wird.
 
 Die Content-Scripts sind jQuery-Code, der NIU-Seiten (ASP.NET WebForms) per DOM-Scraping erweitert. `staff-lib.js`
 kapselt die NIU-Abfragen (GET + simulierte Postbacks mit gescrapten `__EVENTVALIDATION`-Tokens) hinter einem
-PouchDB-Cache (`getFromCache`, DB `niuhelperdb1`, 24 h). Fast alle Cache-Nutzer sitzen in `EmployeeDump.js`
-(Liste/Ausdruck), dem größten Modul. Einzige schreibende Funktion ist `writeMemo` (Sammel-Memo in EmployeeDump).
+PouchDB-Cache (`getFromCache`, DB `niuhelperdb1`, 24 h). Cache-Nutzer sind `EmployeeDump.js` (Liste/Ausdruck,
+größtes Modul) und die beiden Memo-Scripts. Einzige schreibende Funktion ist `writeMemo` (Sammel-Memo in EmployeeDump).
+Das Menü „Funktionen“ in EmployeeDump ist reines CSS (`src/css/style.css`, `webcontent/employee_dump_menu.html`);
+jQuery UI gibt es nicht mehr. `NIU_BASE` existiert nur im Userscript-Shim, Code, der es nutzt, braucht einen Fallback.
 
 ## Repo-spezifische Regeln
 

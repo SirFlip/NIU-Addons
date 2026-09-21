@@ -1,6 +1,8 @@
 # NIU's little helper – Funktionsinventar
 
-Stand: Extension 0.58.3 / Userscript 0.58.3.2 (September 2026).
+Stand: Inventar zu Extension 0.58.3 / Userscript 0.58.3.2 (September 2026).
+**Der Rückbau laut Abschnitt 8 ist mit Version 0.59.0.1 umgesetzt.** Alles mit „weg“ ist
+aus dem Code entfernt; die Tabellen bleiben als Nachschlagewerk, was es einmal gab.
 Zweck: Entscheidungsgrundlage, welche Funktionen beim Umbau bleiben und welche
 entfallen, weil NIU schrittweise abgelöst wird. Die Spalte **Entscheidung**
 enthält seit 2026-09-21 einen **Vorschlag** (behalten / weg / prüfen), siehe
@@ -344,7 +346,7 @@ Alle Postback-Parser hängen an WebForms-Feldnamen (`ctl00$main$…`, Options-In
 
 ---
 
-## 8. Vorsortierung (Stand 2026-09-21, noch nicht umgesetzt)
+## 8. Vorsortierung (Stand 2026-09-21, umgesetzt in 0.59.0.1)
 
 Ausgangslage laut Besitzer: Dienstplanung (Dienstplan **und** Ambulanzen) läuft
 in einem anderen System. Kurse und Kurssuche bleiben in NIU, die Startseite zeigt
@@ -422,5 +424,7 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
 - **P12 Fahrer-Berechtigung:** Die Berechtigung „Fahrer“ wurde in NIU auf drei einzelne Berechtigungen
   aufgeteilt. Der Filter in EmployeeDump (`typ` enthält „Fahrer“) und die Spaltenbeschriftung müssen geprüft und
   ggf. auf die drei neuen Typen umgestellt werden.
+- **Menü in Liste/Ausdruck:** jQuery UI ist entfernt, das Menü „Funktionen“ ist jetzt reines CSS
+  (Hover am Desktop, Tipp auf den Titel am Touch-Gerät). Auf NIU gegenprüfen, ob es sich sauber öffnet.
 - P2: Platzhalter-Empfänger `test@example.com` durch die richtige Adresse ersetzen oder das Feld leer lassen.
 - P8: Kursnamen der Grundkurse und die Cache-Version `grk4` beim Ändern hochzählen.
