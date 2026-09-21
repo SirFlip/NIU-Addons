@@ -1,0 +1,70 @@
+﻿<html>
+
+<head>
+    <title>Einstellungen</title>
+    <meta charset="UTF-8">
+    <style>
+        h4 {
+            margin-bottom: 0.5em;
+        }
+        ul {
+            margin: 0;
+            list-style: none;
+            padding: 0em;
+        }
+        input {
+            margin-right: 0.3em !important;
+            vertical-align: middle !important;
+            top: -0.15em !important;
+        }
+        #save {
+            margin-top: 2em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h2>Einstellungen</h2>
+
+    <h4>Kürzel</h4>
+    <input type="text" id="kuerzel"><br/>
+    <label for="kuerzel">Persönliches Kürzel - wird im Bemerkungsfeld bei Ambulanzen, Ausbildungen, etc verwendet.</label>
+
+
+    <h4>Kurssuche für zukünftige Kurse</h4>
+    <ul>
+        <li>
+            <input type="checkbox" id="STORAGE_KEY_SEARCH_COURSE_ALWAYS_SEARCH">
+            <label for="STORAGE_KEY_SEARCH_COURSE_ALWAYS_SEARCH">Beim Aufruf der Kurssuche automatisch alle Kurse bis ein Jahr in die Zukunft anzeigen.</label>
+        </li>
+    </ul>
+
+    <h4>Cache</h4>
+    <ul>
+        <li>
+            <input type="checkbox" id="STORAGE_KEY_CACHE_ACTIVE" >
+            <label for="STORAGE_KEY_CACHE_ACTIVE">Temporäres Zwischenspeichern der NIU-Anfragen im lokalen Speicher (Empfehlung: Ja)</label>
+        </li>
+    </ul>
+
+    <h4>Optionale Funktionen</h4>
+    <ul>
+        <li>
+            <input type="checkbox" id="STORAGE_KEY_DF_EXP">
+            <label for="STORAGE_KEY_DF_EXP">Autocomplete-Felder im Dienstplan</label>
+        </li>
+        <li>
+            <input type="checkbox" id="STORAGE_KEY_DEKRET_ALERT" checked>
+            <label for="STORAGE_KEY_DEKRET_ALERT">Hinweis für nicht ausgefolgte Dekrete</label>
+        </li>
+    </ul>
+
+    <button id="save">Save</button>
+    <div id="status"></div>
+
+    <script src="definitions.js"></script>
+    <script src="options.js"></script>
+</body>
+
+</html>
