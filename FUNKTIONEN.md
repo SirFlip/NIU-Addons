@@ -423,3 +423,7 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
 - ~~Menü in Liste/Ausdruck~~ auf NIU geprüft 2026-09-21, funktioniert.
 - ~~P2 Platzhalter-Empfänger~~ erledigt in 0.59.0.3: An-Feld bleibt leer, Adressen nur im BCC.
 - P8: Kursnamen der Grundkurse und die Cache-Version `grk4` beim Ändern hochzählen.
+- Erledigt in 0.59.0.4: Kommando-Links auf den Memo-Seiten nutzen den aktuellen Host und teilen sich den Code mit
+  Liste/Ausdruck; Auswertungsspalten in Liste/Ausdruck fragen NIU mit höchstens 4 gleichzeitigen Requests ab;
+  Dekret-Hinweis hat einen Fallback für geänderte Verschachtelung; Kurssuche bricht bei unerwarteter Spaltenzahl nicht
+  mehr ab; GitHub-Workflow baut und testet bei jedem Push.

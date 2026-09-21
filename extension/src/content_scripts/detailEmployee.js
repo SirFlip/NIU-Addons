@@ -9,8 +9,14 @@ $(document).ready(function() {
     if (item[STORAGE_KEY_DEKRET_ALERT]) {
       var dekretAlarm = [];
       $("span[id$='_m_DescriptionLabel']:contains('nicht ausgefolgt')").each(function() {
-        var dekretName = $(this).parent().parent().parent().parent().find("td").first().text();
-        var dekretDatum = $(this).parent().parent().parent().parent().find("input").first().val();
+        var box = $(this).parent().parent().parent().parent();
+        if (!box.find("td").length) {
+          // Fallback, falls NIU die Verschachtelung aendert: naechsten Vorfahren mit Name (td) und Datum (input) suchen
+          box = $(this).parent();
+          for (var k = 0; k < 8 && box.length && !(box.find("td").length && box.find("input").length); k++) { box = box.parent(); }
+        }
+        var dekretName = box.find("td").first().text().trim();
+        var dekretDatum = box.find("input").first().val();
         dekretAlarm.push("<b>" + dekretName + "</b> vom " + dekretDatum);
       });
       if(dekretAlarm.length>0) {

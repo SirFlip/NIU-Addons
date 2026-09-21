@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NIU's little helper (Userscript)
 // @namespace    niu.hannes
-// @version      0.59.0.3
+// @version      0.59.0.4
 // @description  NIU-Addon: Userscript-Portierung von NIU's little helper (Wiener Rotes Kreuz, NIU), reduziert auf Kurse, Mitarbeiter-Verwaltung, Memos und Spezialdienste, plus Filter 'nur 8xxx' im Mitarbeiter-Dropdown.
 // @author       Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes
 // @homepageURL  https://github.com/SirFlip/NIU-Addons
@@ -28,7 +28,7 @@
 // Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).
 
 (function () {
-var __VERSION = "0.59.0.3";
+var __VERSION = "0.59.0.4";
 var jQuery, $, moment, PouchDB, createCalendar, PNotify, ClipboardJS, vex;
 var __RES = {
   "img/addCal.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAARCAYAAADQWvz5AAAAAXNSR0IArs4c6QAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAATVJREFUOBGtU0FOwzAQjFPTBNETh4griBtXvlDxA96AxHuQeAM/QP0CUj+A4AeckEjapstM8FrO0iiKwNLWuzPr6XrXyTKzjorijmbgGA7xPmYER7LswmJpPMS7kHTsi+Iewacmwn9TX4VSLPiLXdM8gP+a4acTwV7BtrATGFfq/yB9jHyVe3+1b9t1XpblGYGQqTvD1A90D1O+okauGX/d/02oNzU2cEpl6TCiEEW2TfNohXD/c2J1Xb9bjm9KxUav1orc0KyIjWNFlmAlO5FL/OOCHN7Z0jv3eqiyjrcCGlME/lJj+sAY/roiwcGK8GJX4Ff63R3qHwV0jfZIE8f2WBF7oRMyh54Zz8L0Ug5X7fpHDFNH0nx+65y7pj91ichLu9k8dUI8TLHcudMpQnuRD4rwzDf+tlv83c+fwAAAAABJRU5ErkJggg==",
@@ -835,6 +835,51 @@ async function getKeyInfo(eid) {
   }
   statustable += "</tbody></table>";
   return statustable;  
+}
+
+// Basis-URL von NIU: im Userscript der aktuelle Host, in der Extension fest
+function niuBase() {
+  return (typeof NIU_BASE !== 'undefined') ? NIU_BASE : 'https://niu.wrk.at';
+}
+
+// Deep-Links zu den Kommando-Funktionen eines Mitarbeiters (Liste/Ausdruck, Memo-Seiten).
+// ids = { EID, ENID } aus dnrToIdentifier; inline = true liefert eine Zeile mit " | " statt einer Liste.
+function kommandoLinks(dnr, ids, inline) {
+  var b = niuBase();
+  var links = [
+    ['Mitarbeiter', '/Kripo/Employee/summaryemployee.aspx?EmployeeId=' + ids.EID],
+    ['Details', '/Kripo/Employee/detailEmployee.aspx?EmployeeId=' + ids.EID],
+    ['Urlaub', '/Kripo/Employee/ListAvailabilities.aspx?EmployeeNumberID=' + ids.ENID],
+    ['Fahrscheingeld', '/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=' + dnr],
+    ['Uniform', '/Kripo/Employee/UniformList.aspx?EmployeeId=' + ids.EID],
+    ['Schl&uuml;ssel', '/Kripo/Employee/IssuedKeys.aspx?EmployeeId=' + ids.EID],
+    ['Memo', '/df/memo/memo_eingeben.asp?DienstNr=' + dnr],
+    ['Ausbildung', '/Kripo/Kufer/SearchCourse.aspx?EmployeeId=' + ids.EID],
+    ['LV Statistik', '/Kripo/Employee/LVStatistic.aspx?EmployeeId=' + ids.EID],
+    ['Statistik', '/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=' + ids.ENID],
+    ['Dokumente', '/Kripo/Employee/Conan/ListDocuments.aspx?EmployeeId=' + ids.EID]
+  ];
+  var a = links.map(function (l) { return "<a target='_blank' href='" + b + l[1] + "'>" + l[0] + "</a>"; });
+  if (inline) { return "<div style='font-size:x-small;'>" + a.join(' | ') + "</div>"; }
+  return "<ul><li>" + a.join("</li><li>") + "</li></ul>";
+}
+
+// Fuehrt worker(item, index) fuer alle items aus, aber hoechstens `limit` gleichzeitig (schont NIU).
+// Liefert ein Promise mit den Ergebnissen in Reihenfolge der items; Fehler ergeben undefined.
+function runWithLimit(items, limit, worker) {
+  var results = new Array(items.length);
+  var next = 0;
+  function run() {
+    if (next >= items.length) { return Promise.resolve(); }
+    var i = next++;
+    return Promise.resolve()
+      .then(function () { return worker(items[i], i); })
+      .then(function (r) { results[i] = r; }, function () { results[i] = undefined; })
+      .then(run);
+  }
+  var lanes = [];
+  for (var k = 0; k < Math.max(1, limit || 1); k++) { lanes.push(run()); }
+  return Promise.all(lanes).then(function () { return results; });
 }
 
 
@@ -26260,6 +26305,7 @@ var __SCRIPTS = {};
 
 // ===== src/content_scripts/memo_last.js =====
 __SCRIPTS["src/content_scripts/memo_last.js"] = function () {
+// Memo LAST: Autor-Filter, Mail-Icon und Kommando-Links je Memo
 $(document).ready(function() {
 
 var counter = 0;
@@ -26269,132 +26315,122 @@ $("body > form").after("<b>Memos f&uuml;r den ausgew&auml;hlten Zeitraum nach Au
 
 $("th:contains('Memo über')").each(function( index ) {
 
-var tableObj = this;
+  var tableObj = this;
 
-var MemoAuthorName = $(this).closest("tbody").children("tr:nth-child(2)").children("th:nth-child(1)").text().trim();
+  var MemoAuthorName = $(this).closest("tbody").children("tr:nth-child(2)").children("th:nth-child(1)").text().trim();
 
-var MemoAuthorOption = new Option(MemoAuthorName, MemoAuthorName);
-$(MemoAuthorOption).html(MemoAuthorName);
+  var MemoAuthorOption = new Option(MemoAuthorName, MemoAuthorName);
+  $(MemoAuthorOption).html(MemoAuthorName);
 
-if(!MemoAuthorsNames.includes(MemoAuthorName)) { MemoAuthorsNames.push(MemoAuthorName); $("#authorfilter").append(MemoAuthorOption); };
+  if(!MemoAuthorsNames.includes(MemoAuthorName)) { MemoAuthorsNames.push(MemoAuthorName); $("#authorfilter").append(MemoAuthorOption); };
 
-$(tableObj).append(" <a id='mailButton" + counter + "'><img src='" + chrome.extension.getURL('/img/envelope.svg') + "' width='12'></a>");
-$(tableObj).append(" <a id='gearButton" + counter + "'><img src='" + chrome.extension.getURL('/img/gear.svg') + "' width='12'></a>");
+  $(tableObj).append(" <a id='mailButton" + counter + "'><img src='" + chrome.extension.getURL('/img/envelope.svg') + "' width='12'></a>");
+  $(tableObj).append(" <a id='gearButton" + counter + "'><img src='" + chrome.extension.getURL('/img/gear.svg') + "' width='12'></a>");
 
-$("#gearButton" + counter).click(function() {
+  // Dienstnummer aus "Memo über Name (DNR)" lesen
+  function memoDnr() {
+    var m = /.*?\((.*?)\)/.exec($(tableObj).text());
+    return m ? m[1].split(",")[0].trim() : null;
+  }
 
-var buttonObj = this;
+  $("#gearButton" + counter).click(function() {
+    var buttonObj = this;
+    var dnr = memoDnr();
+    if (!dnr) { return; }
+    $(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
+    dnrToIdentifier(dnr).then(function(result) {
+      $(buttonObj).hide();
+      $(tableObj).append("<br />" + kommandoLinks(dnr, result, true));
+    });
+  });
 
-$(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
-
-const regex = /.*?\((.*?)\)/g;
-var resultDNRs = regex.exec($(tableObj).text());
-var resultDNr = resultDNRs[1].split(",")[0];
-
-dnrToIdentifier(resultDNr).then(function(result) {
-$(buttonObj).hide();
-$(tableObj).append("<br /><div style='font-size:x-small;'><a target='_blank' href='https://niu.wrk.at/Kripo/Employee/summaryemployee.aspx?EmployeeId=" + result.EID + "'>Mitarbeiter</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/detailEmployee.aspx?EmployeeId=" + result.EID + "'>Details</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/ListAvailabilities.aspx?EmployeeNumberID=" + result.ENID + "'>Urlaub</a> | <a target='_blank' href='https://niu.wrk.at/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=" + resultDNr + "'>Fahrscheingeld</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/UniformList.aspx?EmployeeId=" + result.EID + "'>Uniform</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/IssuedKeys.aspx?EmployeeId=" + result.EID + "'>Schl&uuml;ssel</a> | <a target='_blank' href='https://niu.wrk.at/df/memo/memo_eingeben.asp?DienstNr=" + resultDNr + "'>Memo</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Kufer/SearchCourse.aspx?EmployeeId=" + result.EID + "'>Ausbildung</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/LVStatistic.aspx?EmployeeId=" + result.EID + "'>LV Statistik</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=" + result.ENID + "'>Statistik</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/Conan/ListDocuments.aspx?EmployeeId=" + result.EID + "'>Dokumente</a></div>");
-});
-
-
-});
-$("#mailButton" + counter).click(function() {
-var buttonObj = this;
-
-$(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
-
-const regex = /.*?\((.*?)\)/g;
-var resultDNRs = regex.exec($(tableObj).text());
-var resultDNr = resultDNRs[1].split(",")[0];
-
-dnrToIdentifier(resultDNr).then(function(result) {
-console.log("dnrToIdentifier result: ENID = " + result.ENID + " / EID = " + result.EID);
-return getEmployeeDataSheet(result.ENID) }).then( function(result) {
-	window.open("mailto:" + result.Email);
-	$(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/envelope.svg'));
-});
-});
-counter++;
+  $("#mailButton" + counter).click(function() {
+    var buttonObj = this;
+    var dnr = memoDnr();
+    if (!dnr) { return; }
+    $(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
+    dnrToIdentifier(dnr).then(function(result) {
+      return getEmployeeDataSheet(result.ENID);
+    }).then(function(result) {
+      window.open("mailto:" + result.Email);
+    }).finally(function() {
+      $(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/envelope.svg'));
+    });
+  });
+  counter++;
 });
 
 var select = $('#authorfilter');
-  select.html(select.find('option').sort(function(x, y) {
-    return $(x).text() > $(y).text() ? 1 : -1;
-  }))
-  select.val(0);
+select.html(select.find('option').sort(function(x, y) {
+  return $(x).text() > $(y).text() ? 1 : -1;
+}))
+select.val(0);
 
-$("#authorfilter").change(function ()
-{
-	var selVal = $(this).val();
-
-if(selVal == "0")
-	{
-		$("body > table, body > table + br").show();
-	}
-else
-	{
-		$("body > table, body > table + br").css("display", "none");
-		$("body > table:contains('" + selVal + "'), body > table:contains('" + selVal + "') + br").show();
-	}
-
+$("#authorfilter").change(function () {
+  var selVal = $(this).val();
+  if(selVal == "0") {
+    $("body > table, body > table + br").show();
+  } else {
+    $("body > table, body > table + br").css("display", "none");
+    $("body > table:contains('" + selVal + "'), body > table:contains('" + selVal + "') + br").show();
+  }
 });
 
 });
+
 };
 
 // ===== src/content_scripts/memo_erinnerung.js =====
 __SCRIPTS["src/content_scripts/memo_erinnerung.js"] = function () {
+// Memo-Erinnerungen: Mail-Icon und Kommando-Links je Erinnerung
 $(document).ready(function() {
 
 var counter = 0;
 
 $("tbody > tr:first-child > th").each(function( index ) {
 
-var tableObj = this;
+  var tableObj = this;
 
-if($(tableObj).text().indexOf("erneute") == -1) {
+  if($(tableObj).text().indexOf("erneute") != -1) { return; }
 
-$(tableObj).append(" <a id='mailButton" + counter + "'><img src='" + chrome.extension.getURL('/img/envelope.svg') + "' width='12'></a>");
-$(tableObj).append(" <a id='gearButton" + counter + "'><img src='" + chrome.extension.getURL('/img/gear.svg') + "' width='12'></a>");
+  $(tableObj).append(" <a id='mailButton" + counter + "'><img src='" + chrome.extension.getURL('/img/envelope.svg') + "' width='12'></a>");
+  $(tableObj).append(" <a id='gearButton" + counter + "'><img src='" + chrome.extension.getURL('/img/gear.svg') + "' width='12'></a>");
 
-$("#gearButton" + counter).click(function() {
+  // Dienstnummer ist das erste Wort der Kopfzeile
+  function memoDnr() {
+    var m = /(.*?) /.exec($(tableObj).text());
+    return m ? m[1].split(",")[0].trim() : null;
+  }
 
-var buttonObj = this;
+  $("#gearButton" + counter).click(function() {
+    var buttonObj = this;
+    var dnr = memoDnr();
+    if (!dnr) { return; }
+    $(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
+    dnrToIdentifier(dnr).then(function(result) {
+      $(buttonObj).hide();
+      $(tableObj).append("<br />" + kommandoLinks(dnr, result, true));
+    });
+  });
 
-$(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
-
-const regex = /(.*?) /g;
-var resultDNRs = regex.exec($(tableObj).text());
-var resultDNr = resultDNRs[1].split(",")[0];
-
-dnrToIdentifier(resultDNr).then(function(result) {
-$(buttonObj).hide();
-$(tableObj).append("<br /><div style='font-size:x-small;'><a target='_blank' href='https://niu.wrk.at/Kripo/Employee/summaryemployee.aspx?EmployeeId=" + result.EID + "'>Mitarbeiter</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/detailEmployee.aspx?EmployeeId=" + result.EID + "'>Details</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/ListAvailabilities.aspx?EmployeeNumberID=" + result.ENID + "'>Urlaub</a> | <a target='_blank' href='https://niu.wrk.at/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=" + resultDNr + "'>Fahrscheingeld</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/UniformList.aspx?EmployeeId=" + result.EID + "'>Uniform</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/IssuedKeys.aspx?EmployeeId=" + result.EID + "'>Schl&uuml;ssel</a> | <a target='_blank' href='https://niu.wrk.at/df/memo/memo_eingeben.asp?DienstNr=" + resultDNr + "'>Memo</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Kufer/SearchCourse.aspx?EmployeeId=" + result.EID + "'>Ausbildung</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/LVStatistic.aspx?EmployeeId=" + result.EID + "'>LV Statistik</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=" + result.ENID + "'>Statistik</a> | <a target='_blank' href='https://niu.wrk.at/Kripo/Employee/Conan/ListDocuments.aspx?EmployeeId=" + result.EID + "'>Dokumente</a></div>");
-});
-
-
-});
-$("#mailButton" + counter).click(function() {
-var buttonObj = this;
-
-$(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
-
-const regex = /(.*?) /g;
-var resultDNRs = regex.exec($(tableObj).text());
-var resultDNr = resultDNRs[1].split(",")[0];
-
-dnrToIdentifier(resultDNr).then(function(result) {
-console.log("dnrToIdentifier result: ENID = " + result.ENID + " / EID = " + result.EID);
-return getEmployeeDataSheet(result.ENID) }).then( function(result) {
-	window.open("mailto:" + result.Email);
-	$(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/envelope.svg'));
-});
-});
-counter++;
-}
+  $("#mailButton" + counter).click(function() {
+    var buttonObj = this;
+    var dnr = memoDnr();
+    if (!dnr) { return; }
+    $(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/ajax-loader.gif'));
+    dnrToIdentifier(dnr).then(function(result) {
+      return getEmployeeDataSheet(result.ENID);
+    }).then(function(result) {
+      window.open("mailto:" + result.Email);
+    }).finally(function() {
+      $(buttonObj).find("img").attr("src", chrome.extension.getURL('/img/envelope.svg'));
+    });
+  });
+  counter++;
 });
 
 });
+
 };
 
 // ===== src/content_scripts/Spezialdiensteingabe.js =====
@@ -26436,8 +26472,14 @@ $(document).ready(function() {
     if (item[STORAGE_KEY_DEKRET_ALERT]) {
       var dekretAlarm = [];
       $("span[id$='_m_DescriptionLabel']:contains('nicht ausgefolgt')").each(function() {
-        var dekretName = $(this).parent().parent().parent().parent().find("td").first().text();
-        var dekretDatum = $(this).parent().parent().parent().parent().find("input").first().val();
+        var box = $(this).parent().parent().parent().parent();
+        if (!box.find("td").length) {
+          // Fallback, falls NIU die Verschachtelung aendert: naechsten Vorfahren mit Name (td) und Datum (input) suchen
+          box = $(this).parent();
+          for (var k = 0; k < 8 && box.length && !(box.find("td").length && box.find("input").length); k++) { box = box.parent(); }
+        }
+        var dekretName = box.find("td").first().text().trim();
+        var dekretDatum = box.find("input").first().val();
         dekretAlarm.push("<b>" + dekretName + "</b> vom " + dekretDatum);
       });
       if(dekretAlarm.length>0) {
@@ -27093,7 +27135,9 @@ $(document).ready(function() {
     //Ausbildungen ganz normal als Suche nach Ausbildungen
     headers = ausbheaders;
   } else {
-    throw "ungültige anzahl an spalten!";
+    // keine oder unbekannte Kurstabelle: Ausblenden/Autosuche sind schon eingerichtet, Tabelle bleibt wie sie ist
+    if (tabelle.length) { console.warn("NIU-Addon: Kurstabelle hat unerwartete Spaltenzahl (" + tds.length + "), keine Sortiertabelle."); }
+    return;
   }
 
   tabelle.find("tr").slice(1).each(function(index) {
@@ -27225,6 +27269,7 @@ __SCRIPTS["src/content_scripts/EmployeeDump.js"] = function () {
       Tabellenzelle geschrieben wird
 */
 var clicked = {};
+var MAX_PARALLEL = 4; // gleichzeitige NIU-Abfragen je Spalte
 vex.defaultOptions.className = 'vex-theme-os';
 
 function addCalculationHandler(id, names, callback) {
@@ -27246,36 +27291,21 @@ function addCalculationHandler(id, names, callback) {
 
         initDataTable();
 
-        //TODO: um das NIU zu schonen sollten die Abfragen hier seriell abgearbeitet werden
-        var ready = Promise.resolve();
-        for (var index in dataSet) {
-          var row = dataSet[index];
+        var c = columns.length - 1;
+        dataSet.forEach(function(r) {
+          r[name.calcname] = "<img id='ajaxloader' src='" + chrome.extension.getURL('/img/ajax-loader.gif') + "'>";
+        });
+        datatable.rows().invalidate().draw();
 
-          var p = new Promise(function(resolve, raise) {
-               var i = index;
-               var r = row;
-               var c = columns.length - 1;
-
-               r[name.calcname] = "<img id='ajaxloader' src='" + chrome.extension.getURL('/img/ajax-loader.gif') + "'>";
-               datatable.cell(i, c).invalidate().draw();
-
-               var res = callback(r.DNR, name, r)
-                .then(function(value) {
-                  r[name.calcname] = value;
-                  datatable.cell(i, c).invalidate().draw();
-                })
-                .catch(function(error) {
-                  console.log("addCalculationHandler -> promise then mit error: " + error);
-                });
-                resolve(res);
-          });
-          ready = ready.then(function() {
-           return p;
-          });
-
-        }
-        ready.then(function() { //warte auf die promises...
-          console.log("addCalculationHandler --> promises abgearbeitet");
+        // hoechstens MAX_PARALLEL Abfragen gleichzeitig, um NIU zu schonen
+        runWithLimit(dataSet, MAX_PARALLEL, function(r, i) {
+          return callback(r.DNR, name, r)
+            .then(function(value) { r[name.calcname] = value; })
+            .catch(function(error) {
+              console.log("addCalculationHandler -> Fehler bei " + r.DNR + ": " + error);
+              r[name.calcname] = "Fehler";
+            })
+            .then(function() { datatable.cell(i, c).invalidate().draw(); });
         });
     });
   });
@@ -27400,23 +27430,6 @@ $.fn.dataTable.ext.search.push(
 function generateMailLink(bcc) {
   var list = bcc.filter(function (m) { return m && String(m).trim() !== ""; });
   return "mailto:?" + $.param({ bcc: list.join(",") });
-}
-
-// Liste mit Deep-Links zu den Kommando-Funktionen eines Mitarbeiters
-function kommandoLinks(dnr, result) {
-  var base = (typeof NIU_BASE !== 'undefined') ? NIU_BASE : 'https://niu.wrk.at';
-  return "<ul>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/summaryemployee.aspx?EmployeeId=" + result.EID + "'>Mitarbeiter</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/detailEmployee.aspx?EmployeeId=" + result.EID + "'>Details</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/ListAvailabilities.aspx?EmployeeNumberID=" + result.ENID + "'>Urlaub</a></li>" +
-    "<li><a target='_blank' href='" + base + "/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=" + dnr + "'>Fahrscheingeld</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/UniformList.aspx?EmployeeId=" + result.EID + "'>Uniform</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/IssuedKeys.aspx?EmployeeId=" + result.EID + "'>Schl&uuml;ssel</a></li>" +
-    "<li><a target='_blank' href='" + base + "/df/memo/memo_eingeben.asp?DienstNr=" + dnr + "'>Memo</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Kufer/SearchCourse.aspx?EmployeeId=" + result.EID + "'>Ausbildung</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/LVStatistic.aspx?EmployeeId=" + result.EID + "'>LV Statistik</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/Conan/ListDocuments.aspx?EmployeeId=" + result.EID + "'>Dokumente</a></li>" +
-    "</ul>";
 }
 
 // Hilfsfunktion: Datenblatt eines Mitarbeiters holen und eine Spalte daraus berechnen

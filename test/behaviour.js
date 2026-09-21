@@ -49,5 +49,11 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const has = (n) => { try { return typeof probe(n) !== 'undefined'; } catch (e) { return false; } };
   t('staff-lib: entfernte Funktionen sind weg', !has('getKuerzel') && !has('calculateDutyStatistic') && !has('makeEmployeeSearchField'));
   t('NIU_BASE folgt dem Host (http://niu)', probe('NIU_BASE') === 'http://niu');
+  // runWithLimit: hoechstens 2 gleichzeitig, Ergebnisse in Reihenfolge, Fehler ergeben undefined
+  const rwl = probe('runWithLimit'); let running = 0, peak = 0;
+  const res = await rwl([1, 2, 3, 4, 5], 2, (x) => new Promise((r, j) => { running++; peak = Math.max(peak, running); setTimeout(() => { running--; x === 3 ? j(new Error('x')) : r(x * 10); }, 15); }));
+  t('runWithLimit: Reihenfolge, Limit, Fehler', JSON.stringify(res) === '[10,20,null,40,50]' && peak === 2);
+  const kl = probe('kommandoLinks')('8123', { EID: 'e', ENID: 'n' }, true);
+  t('kommandoLinks: aktueller Host, DNr und IDs eingesetzt', /href='http:\/\/niu\/Kripo\/Employee\/detailEmployee\.aspx\?EmployeeId=e'/.test(kl) && /DienstNr=8123'/.test(kl) && /EmployeeNumberID=n'/.test(kl) && kl.split(' | ').length === 11);
   process.exit(ok ? 0 : 1);
 })();

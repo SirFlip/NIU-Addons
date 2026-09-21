@@ -10,6 +10,7 @@
       Tabellenzelle geschrieben wird
 */
 var clicked = {};
+var MAX_PARALLEL = 4; // gleichzeitige NIU-Abfragen je Spalte
 vex.defaultOptions.className = 'vex-theme-os';
 
 function addCalculationHandler(id, names, callback) {
@@ -31,36 +32,21 @@ function addCalculationHandler(id, names, callback) {
 
         initDataTable();
 
-        //TODO: um das NIU zu schonen sollten die Abfragen hier seriell abgearbeitet werden
-        var ready = Promise.resolve();
-        for (var index in dataSet) {
-          var row = dataSet[index];
+        var c = columns.length - 1;
+        dataSet.forEach(function(r) {
+          r[name.calcname] = "<img id='ajaxloader' src='" + chrome.extension.getURL('/img/ajax-loader.gif') + "'>";
+        });
+        datatable.rows().invalidate().draw();
 
-          var p = new Promise(function(resolve, raise) {
-               var i = index;
-               var r = row;
-               var c = columns.length - 1;
-
-               r[name.calcname] = "<img id='ajaxloader' src='" + chrome.extension.getURL('/img/ajax-loader.gif') + "'>";
-               datatable.cell(i, c).invalidate().draw();
-
-               var res = callback(r.DNR, name, r)
-                .then(function(value) {
-                  r[name.calcname] = value;
-                  datatable.cell(i, c).invalidate().draw();
-                })
-                .catch(function(error) {
-                  console.log("addCalculationHandler -> promise then mit error: " + error);
-                });
-                resolve(res);
-          });
-          ready = ready.then(function() {
-           return p;
-          });
-
-        }
-        ready.then(function() { //warte auf die promises...
-          console.log("addCalculationHandler --> promises abgearbeitet");
+        // hoechstens MAX_PARALLEL Abfragen gleichzeitig, um NIU zu schonen
+        runWithLimit(dataSet, MAX_PARALLEL, function(r, i) {
+          return callback(r.DNR, name, r)
+            .then(function(value) { r[name.calcname] = value; })
+            .catch(function(error) {
+              console.log("addCalculationHandler -> Fehler bei " + r.DNR + ": " + error);
+              r[name.calcname] = "Fehler";
+            })
+            .then(function() { datatable.cell(i, c).invalidate().draw(); });
         });
     });
   });
@@ -185,23 +171,6 @@ $.fn.dataTable.ext.search.push(
 function generateMailLink(bcc) {
   var list = bcc.filter(function (m) { return m && String(m).trim() !== ""; });
   return "mailto:?" + $.param({ bcc: list.join(",") });
-}
-
-// Liste mit Deep-Links zu den Kommando-Funktionen eines Mitarbeiters
-function kommandoLinks(dnr, result) {
-  var base = (typeof NIU_BASE !== 'undefined') ? NIU_BASE : 'https://niu.wrk.at';
-  return "<ul>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/summaryemployee.aspx?EmployeeId=" + result.EID + "'>Mitarbeiter</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/detailEmployee.aspx?EmployeeId=" + result.EID + "'>Details</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/ListAvailabilities.aspx?EmployeeNumberID=" + result.ENID + "'>Urlaub</a></li>" +
-    "<li><a target='_blank' href='" + base + "/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=" + dnr + "'>Fahrscheingeld</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/UniformList.aspx?EmployeeId=" + result.EID + "'>Uniform</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/IssuedKeys.aspx?EmployeeId=" + result.EID + "'>Schl&uuml;ssel</a></li>" +
-    "<li><a target='_blank' href='" + base + "/df/memo/memo_eingeben.asp?DienstNr=" + dnr + "'>Memo</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Kufer/SearchCourse.aspx?EmployeeId=" + result.EID + "'>Ausbildung</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/LVStatistic.aspx?EmployeeId=" + result.EID + "'>LV Statistik</a></li>" +
-    "<li><a target='_blank' href='" + base + "/Kripo/Employee/Conan/ListDocuments.aspx?EmployeeId=" + result.EID + "'>Dokumente</a></li>" +
-    "</ul>";
 }
 
 // Hilfsfunktion: Datenblatt eines Mitarbeiters holen und eine Spalte daraus berechnen

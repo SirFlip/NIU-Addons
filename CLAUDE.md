@@ -43,6 +43,8 @@ gh release create vX.Y.Z.N dist/niu-little-helper.user.js dist/niu-little-helper
 
 `@updateURL`/`@downloadURL` zeigen fest auf `releases/latest/download/…` von SirFlip/NIU-Addons.
 
+CI: `.github/workflows/ci.yml` baut bei jedem Push, prüft, dass `dist/` zum Quellstand passt, und lässt die drei Tests laufen.
+
 ## Architektur
 
 **Quelle der Wahrheit ist `extension/`** (Original-Extension, Manifest V2). `build.py` liest `extension/manifest.json`
@@ -69,7 +71,8 @@ Aufbau der gebauten Datei (alles in einer IIFE, gemeinsamer Scope wie bei Conten
 Die Content-Scripts sind jQuery-Code, der NIU-Seiten (ASP.NET WebForms) per DOM-Scraping erweitert. `staff-lib.js`
 kapselt die NIU-Abfragen (GET + simulierte Postbacks mit gescrapten `__EVENTVALIDATION`-Tokens) hinter einem
 PouchDB-Cache (`getFromCache`, DB `niuhelperdb1`, 24 h). Cache-Nutzer sind `EmployeeDump.js` (Liste/Ausdruck,
-größtes Modul) und die beiden Memo-Scripts. Einzige schreibende Funktion ist `writeMemo` (Sammel-Memo in EmployeeDump).
+größtes Modul) und die beiden Memo-Scripts. Gemeinsame Helfer dort: `kommandoLinks` (Deep-Links je Mitarbeiter,
+nutzt `niuBase()`), `runWithLimit` (gedrosselte parallele Abfragen). Einzige schreibende Funktion ist `writeMemo` (Sammel-Memo in EmployeeDump).
 Das Menü „Funktionen“ in EmployeeDump ist reines CSS (`src/css/style.css`, `webcontent/employee_dump_menu.html`);
 jQuery UI gibt es nicht mehr. `NIU_BASE` existiert nur im Userscript-Shim, Code, der es nutzt, braucht einen Fallback.
 

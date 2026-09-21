@@ -462,3 +462,48 @@ async function getKeyInfo(eid) {
   statustable += "</tbody></table>";
   return statustable;  
 }
+
+// Basis-URL von NIU: im Userscript der aktuelle Host, in der Extension fest
+function niuBase() {
+  return (typeof NIU_BASE !== 'undefined') ? NIU_BASE : 'https://niu.wrk.at';
+}
+
+// Deep-Links zu den Kommando-Funktionen eines Mitarbeiters (Liste/Ausdruck, Memo-Seiten).
+// ids = { EID, ENID } aus dnrToIdentifier; inline = true liefert eine Zeile mit " | " statt einer Liste.
+function kommandoLinks(dnr, ids, inline) {
+  var b = niuBase();
+  var links = [
+    ['Mitarbeiter', '/Kripo/Employee/summaryemployee.aspx?EmployeeId=' + ids.EID],
+    ['Details', '/Kripo/Employee/detailEmployee.aspx?EmployeeId=' + ids.EID],
+    ['Urlaub', '/Kripo/Employee/ListAvailabilities.aspx?EmployeeNumberID=' + ids.ENID],
+    ['Fahrscheingeld', '/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=' + dnr],
+    ['Uniform', '/Kripo/Employee/UniformList.aspx?EmployeeId=' + ids.EID],
+    ['Schl&uuml;ssel', '/Kripo/Employee/IssuedKeys.aspx?EmployeeId=' + ids.EID],
+    ['Memo', '/df/memo/memo_eingeben.asp?DienstNr=' + dnr],
+    ['Ausbildung', '/Kripo/Kufer/SearchCourse.aspx?EmployeeId=' + ids.EID],
+    ['LV Statistik', '/Kripo/Employee/LVStatistic.aspx?EmployeeId=' + ids.EID],
+    ['Statistik', '/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=' + ids.ENID],
+    ['Dokumente', '/Kripo/Employee/Conan/ListDocuments.aspx?EmployeeId=' + ids.EID]
+  ];
+  var a = links.map(function (l) { return "<a target='_blank' href='" + b + l[1] + "'>" + l[0] + "</a>"; });
+  if (inline) { return "<div style='font-size:x-small;'>" + a.join(' | ') + "</div>"; }
+  return "<ul><li>" + a.join("</li><li>") + "</li></ul>";
+}
+
+// Fuehrt worker(item, index) fuer alle items aus, aber hoechstens `limit` gleichzeitig (schont NIU).
+// Liefert ein Promise mit den Ergebnissen in Reihenfolge der items; Fehler ergeben undefined.
+function runWithLimit(items, limit, worker) {
+  var results = new Array(items.length);
+  var next = 0;
+  function run() {
+    if (next >= items.length) { return Promise.resolve(); }
+    var i = next++;
+    return Promise.resolve()
+      .then(function () { return worker(items[i], i); })
+      .then(function (r) { results[i] = r; }, function () { results[i] = undefined; })
+      .then(run);
+  }
+  var lanes = [];
+  for (var k = 0; k < Math.max(1, limit || 1); k++) { lanes.push(run()); }
+  return Promise.all(lanes).then(function () { return results; });
+}

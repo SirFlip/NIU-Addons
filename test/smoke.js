@@ -37,8 +37,7 @@ const cases = [
     expectScripts: ['today.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
     check: (w) => [/calendar\/render/.test(w.document.body.innerHTML), /Nottendorfergasse/.test(w.document.body.innerHTML), w.document.querySelector('#ctl00_main_m_CourseList__CourseTable a').target === 'wrk_todayDetail'] },
   { url: 'https://niu.wrk.at/Kripo/Kufer/SearchCourse.aspx', html: '<table></table>',
-    expectScripts: ['SearchCourse.js', 'nur8xxx.js'], expectGlobals: ['moment'],
-    tolerate: /ungültige anzahl an spalten/ }, // Fixture hat keine Kurstabelle
+    expectScripts: ['SearchCourse.js', 'nur8xxx.js'], expectGlobals: ['moment'] }, // Fixture hat keine Kurstabelle, darf nicht werfen
   { url: 'https://niu.wrk.at/Kripo/Kufer/CourseDetail.aspx?CourseID=K1', html: '<h1>Kurs</h1><h5>K1 - Test</h5><table class="MessageTable"><tr></tr><tr></tr></table>',
     expectScripts: ['CourseDetail.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
     check: (w) => [!w.document.querySelector('#person_autocomplete')] },

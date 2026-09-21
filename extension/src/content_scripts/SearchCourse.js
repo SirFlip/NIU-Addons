@@ -185,7 +185,9 @@ $(document).ready(function() {
     //Ausbildungen ganz normal als Suche nach Ausbildungen
     headers = ausbheaders;
   } else {
-    throw "ungültige anzahl an spalten!";
+    // keine oder unbekannte Kurstabelle: Ausblenden/Autosuche sind schon eingerichtet, Tabelle bleibt wie sie ist
+    if (tabelle.length) { console.warn("NIU-Addon: Kurstabelle hat unerwartete Spaltenzahl (" + tds.length + "), keine Sortiertabelle."); }
+    return;
   }
 
   tabelle.find("tr").slice(1).each(function(index) {
