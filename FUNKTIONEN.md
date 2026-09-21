@@ -421,5 +421,5 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
 - ~~„nur 8xxx“ für andere Nummernkreise~~ erledigt in 0.59.0.2: Tausenderziffer in den Einstellungen wählbar (1 bis 9), weiterhin nur vierstellige Nummern.
 - ~~P12 Fahrer-Berechtigung~~ geprüft 2026-09-21: Filter findet die drei neuen Berechtigungen, weil er auf „Fahrer“ im Typ matcht. Keine Änderung nötig.
 - ~~Menü in Liste/Ausdruck~~ auf NIU geprüft 2026-09-21, funktioniert.
-- P2: Platzhalter-Empfänger `test@example.com` durch die richtige Adresse ersetzen oder das Feld leer lassen.
+- ~~P2 Platzhalter-Empfänger~~ erledigt in 0.59.0.3: An-Feld bleibt leer, Adressen nur im BCC.
 - P8: Kursnamen der Grundkurse und die Cache-Version `grk4` beim Ändern hochzählen.

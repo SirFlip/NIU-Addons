@@ -181,19 +181,10 @@ $.fn.dataTable.ext.search.push(
 );
 
 
-// TODO (P2): Empfaenger ist ein Platzhalter, siehe FUNKTIONEN.md Abschnitt 9
-var mail = "test@example.com";
-function generateMailLink(subject, body, to, cc, bcc) {
-  var bcclist = "";
-  for (let m of bcc) {
-    bcclist = bcclist + "," + m;
-  }
-  bcclist = bcclist.substring(1, bcclist.length);
-
-  var mailto = "mailto:" + mail + "?" + $.param({
-    bcc : bcclist
-  });
-  return mailto;
+// Sammel-Mail: alle Adressen ins BCC, An-Feld bleibt leer (frueher stand hier ein Platzhalter-Empfaenger)
+function generateMailLink(bcc) {
+  var list = bcc.filter(function (m) { return m && String(m).trim() !== ""; });
+  return "mailto:?" + $.param({ bcc: list.join(",") });
 }
 
 // Liste mit Deep-Links zu den Kommando-Funktionen eines Mitarbeiters
@@ -286,7 +277,7 @@ $(document).ready(function() {
     header.after("<button type='button' class='niu-btn' id='mailto_alle_sichtbaren'>Mailto an alle sichtbaren</button>");
     $('#mailto_alle_sichtbaren').click(function() {
       var mails = datatable.rows({filter: 'applied'}).column("Email:name").data().toArray();
-      window.open(generateMailLink("", "", [], [], mails));
+      window.open(generateMailLink(mails));
     });
 
     header.after("<button type='button' class='niu-btn' id='mailto_alle_selektiert'>Mailto an alle selektierten</button>");
@@ -299,7 +290,7 @@ $(document).ready(function() {
       $.each($(datatable.rows('.selected').data()),function(key,value){
          mails.push(value.Email);
       });
-      window.open(generateMailLink("", "", [], [], mails));
+      window.open(generateMailLink(mails));
     });
 
     header.after("<button type='button' class='niu-btn' id='memo_alle_selektiert'>Memo f&uuml;r alle selektierten</button>");

@@ -27,7 +27,10 @@ const cases = [
     expectScripts: ['EmployeeDump.js', 'nur8xxx.js'], expectGlobals: ['jQuery', 'PouchDB', 'vex'],
     check: (w) => [!!w.document.querySelector('#menu'), !!w.document.querySelector('#grundkurse'), !w.document.querySelector('#rddienste'), !w.document.querySelector('#pflichtfortbildungen'),
       !!w.document.querySelector('button#memo_alle_selektiert'), !!w.document.querySelector('#datatable tfoot .footer_input')],
-    after: async (w) => { w.document.querySelector('#menu .menu-title').click(); return [w.document.querySelector('#menu > li').classList.contains('open')]; } },
+    after: async (w) => { w.document.querySelector('#menu .menu-title').click();
+      let opened = null; w.open = (u) => { opened = u; return null; };
+      w.document.querySelector('#mailto_alle_sichtbaren').click();
+      return [w.document.querySelector('#menu > li').classList.contains('open'), opened === 'mailto:?bcc=a%40example.org']; } },
   // Startseite: nur noch Kurs-Export
   { url: 'https://niu.wrk.at/Kripo/Today/Today.aspx',
     html: '<table id="ctl00_main_m_CourseList__CourseTable"><tr><td>h</td></tr><tr><td>h2</td></tr><tr><td>K123</td><td><a class="CourseTitel" href="/Kripo/Kufer/CourseDetail.aspx?CourseID=K123">Kurs A</a></td><td>Mo, 05.10.2026 08:00</td><td>Mo, 05.10.2026 16:00</td><td>LV</td></tr></table>',
