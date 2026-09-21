@@ -1,9 +1,15 @@
-// Mitarbeiter-Dropdown: Häkchen "nur 8xxx" (ehemals eigenes Userscript "NIU – Mitarbeiter-Dropdown nur 8xxx" v1.1)
+// Mitarbeiter-Dropdown: Häkchen "nur <Z>xxx" (ehemals eigenes Userscript "NIU – Mitarbeiter-Dropdown nur 8xxx" v1.1).
+// Die Tausenderziffer Z kommt aus den Einstellungen (Standard 8); gefiltert werden nur vierstellige Dienstnummern.
 (function () {
   'use strict';
 
-  const KEY = 'niu_nur8xxx';
-  const RX = /\(8\d{3}\)\s*$/;
+  const KEY = 'niu_nur8xxx';   // Ein/Aus-Zustand je Browser (localStorage)
+  let prefix = DEFAULT_DNR_PREFIX;
+  let rx = makeRegex(prefix);
+
+  function makeRegex(z) {
+    return new RegExp('\\(' + z + '\\d{3}\\)\\s*$');
+  }
 
   function install() {
     const s = document.getElementById('m_ddlEmployee');
@@ -18,12 +24,13 @@
     cb.type = 'checkbox';
     cb.style.verticalAlign = 'middle';
     label.appendChild(cb);
-    label.appendChild(document.createTextNode(' nur 8xxx'));
+    const text = document.createTextNode(' nur ' + prefix + 'xxx');
+    label.appendChild(text);
     s.parentNode.insertBefore(label, s.nextSibling);
 
     function apply() {
       const cur = s.value;
-      const keep = cb.checked ? s._all.filter(o => RX.test(o.text)) : s._all;
+      const keep = cb.checked ? s._all.filter(o => rx.test(o.text)) : s._all;
       while (s.options.length) s.remove(0);
       keep.forEach(o => s.add(o));
       const idx = keep.findIndex(o => o.value === cur);
@@ -38,7 +45,14 @@
     try { if (localStorage.getItem(KEY) === '1') { cb.checked = true; apply(); } } catch (e) {}
   }
 
-  install();
-  // Falls das Dropdown erst später (z. B. per Postback) nachgeladen wird
-  new MutationObserver(install).observe(document.body, { childList: true, subtree: true });
+  // Tausenderziffer aus den Einstellungen lesen, dann einhängen
+  const load = {};
+  load[STORAGE_KEY_DNR_PREFIX] = DEFAULT_DNR_PREFIX;
+  chrome.storage.sync.get(load, function (items) {
+    const z = String(items[STORAGE_KEY_DNR_PREFIX] || DEFAULT_DNR_PREFIX);
+    if (/^[1-9]$/.test(z)) { prefix = z; rx = makeRegex(z); }
+    install();
+    // Falls das Dropdown erst später (z. B. per Postback) nachgeladen wird
+    new MutationObserver(install).observe(document.body, { childList: true, subtree: true });
+  });
 })();

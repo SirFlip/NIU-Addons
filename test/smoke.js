@@ -47,7 +47,7 @@ const cases = [
   { url: 'https://intranet.wrk.at/confluence/pages/viewpage.action?spaceKey=VFM&title=Bescheiderstellung', html: '<div id="main-content"></div>', expectScripts: [], expectGlobals: [] },
   { url: 'https://niu.wrk.at/Kripo/Header.aspx#niu-helper-settings', html: '<span id="pageTitle">NIU</span>',
     expectScripts: ['Header.js', 'header-extras.js', 'nur8xxx.js', 'settings.js'], expectGlobals: [],
-    check: (w) => [w.document.title.includes('Einstellungen'), w.document.querySelectorAll('input').length === 3] },
+    check: (w) => [w.document.title.includes('Einstellungen'), w.document.querySelectorAll('input').length === 3, w.document.querySelectorAll('select').length === 1] },
   { url: 'https://niu.wrk.at/irgendwas/anderes.aspx', html: '', expectScripts: [], expectGlobals: [] },
 ];
 

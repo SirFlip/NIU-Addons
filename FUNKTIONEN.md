@@ -418,13 +418,8 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
 
 ## 9. Offene To-dos (unabhängig vom Rückbau)
 
-- **„nur 8xxx“ für andere Nummernkreise:** Das Häkchen am Mitarbeiter-Dropdown filtert fest auf 8000–8999
-  (`userscript/nur8xxx.js`, Regex `\(8\d{3}\)`). Gewünscht ist eine Auswahl des Nummernkreises, z. B. über die
-  Einstellungsseite (Bereich eintragen oder aus den vorhandenen Tausenderbereichen wählen), Zustand weiterhin merken.
-- **P12 Fahrer-Berechtigung:** Die Berechtigung „Fahrer“ wurde in NIU auf drei einzelne Berechtigungen
-  aufgeteilt. Der Filter in EmployeeDump (`typ` enthält „Fahrer“) und die Spaltenbeschriftung müssen geprüft und
-  ggf. auf die drei neuen Typen umgestellt werden.
-- **Menü in Liste/Ausdruck:** jQuery UI ist entfernt, das Menü „Funktionen“ ist jetzt reines CSS
-  (Hover am Desktop, Tipp auf den Titel am Touch-Gerät). Auf NIU gegenprüfen, ob es sich sauber öffnet.
+- ~~„nur 8xxx“ für andere Nummernkreise~~ erledigt in 0.59.0.2: Tausenderziffer in den Einstellungen wählbar (1 bis 9), weiterhin nur vierstellige Nummern.
+- ~~P12 Fahrer-Berechtigung~~ geprüft 2026-09-21: Filter findet die drei neuen Berechtigungen, weil er auf „Fahrer“ im Typ matcht. Keine Änderung nötig.
+- ~~Menü in Liste/Ausdruck~~ auf NIU geprüft 2026-09-21, funktioniert.
 - P2: Platzhalter-Empfänger `test@example.com` durch die richtige Adresse ersetzen oder das Feld leer lassen.
 - P8: Kursnamen der Grundkurse und die Cache-Version `grk4` beim Ändern hochzählen.

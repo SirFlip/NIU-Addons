@@ -9,7 +9,10 @@
     { key: STORAGE_KEY_CACHE_ACTIVE, type: 'checkbox', def: DEFAULT_CACHE_ACTIVE, title: 'Cache',
       label: 'Temporäres Zwischenspeichern der NIU-Anfragen im lokalen Speicher (Empfehlung: Ja)' },
     { key: STORAGE_KEY_DEKRET_ALERT, type: 'checkbox', def: DEFAULT_DEKRET_ALERT, title: 'Mitarbeiter-Detailseite',
-      label: 'Hinweis für nicht ausgefolgte Dekrete' }
+      label: 'Hinweis für nicht ausgefolgte Dekrete' },
+    { key: STORAGE_KEY_DNR_PREFIX, type: 'select', def: DEFAULT_DNR_PREFIX, title: 'Mitarbeiter-Dropdown',
+      options: ['1','2','3','4','5','6','7','8','9'].map(function (z) { return { value: z, text: z + 'xxx' }; }),
+      label: 'Nummernkreis für das Häkchen „nur …xxx“ (nur vierstellige Dienstnummern)' }
   ];
 
   document.title = "NIU-Addon – Einstellungen";
@@ -36,9 +39,20 @@
     }
     var row = document.createElement('label');
     row.style.cssText = 'display:block;margin:.3em 0;cursor:pointer;';
-    var input = document.createElement('input');
-    input.type = f.type;
-    input.style.cssText = f.type === 'text' ? 'display:block;margin-bottom:.3em;padding:.3em;width:12em;' : 'margin-right:.5em;vertical-align:middle;';
+    var input;
+    if (f.type === 'select') {
+      input = document.createElement('select');
+      f.options.forEach(function (o) {
+        var opt = document.createElement('option');
+        opt.value = o.value; opt.textContent = o.text;
+        input.appendChild(opt);
+      });
+      input.style.cssText = 'margin-right:.5em;vertical-align:middle;padding:.2em;';
+    } else {
+      input = document.createElement('input');
+      input.type = f.type;
+      input.style.cssText = f.type === 'text' ? 'display:block;margin-bottom:.3em;padding:.3em;width:12em;' : 'margin-right:.5em;vertical-align:middle;';
+    }
     row.appendChild(input);
     row.appendChild(document.createTextNode(f.label));
     box.appendChild(row);
@@ -65,7 +79,7 @@
   chrome.storage.sync.get(load, function (items) {
     fields.forEach(function (f) {
       if (f.type === 'checkbox') inputs[f.key].checked = !!items[f.key];
-      else inputs[f.key].value = items[f.key] || '';
+      else inputs[f.key].value = items[f.key] || f.def || '';
     });
   });
 

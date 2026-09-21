@@ -11,3 +11,7 @@ var POUCHDB_DB_NAME = "niuhelperdb1";
 
 var STORAGE_KEY_DEKRET_ALERT = "niu_dekret_alert";
 var DEFAULT_DEKRET_ALERT = true;
+
+// Tausenderziffer fuer das Haekchen "nur <Z>xxx" am Mitarbeiter-Dropdown (nur vierstellige Nummern)
+var STORAGE_KEY_DNR_PREFIX = "niu_dnr_prefix";
+var DEFAULT_DNR_PREFIX = "8";

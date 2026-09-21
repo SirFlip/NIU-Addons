@@ -91,7 +91,7 @@ zugehörigen Funktionen wurden entfernt.
 - **Mitarbeiter kurz/Zusammenfassung:** VCF- und Foto-Download.
 - **Memos:** Autor-Filter, Mail-Icon und Kommando-Links je Memo.
 - **Spezialdienste:** Eingabeformular vorbefüllen, „alle OK“ beim Unterschreiben.
-- **Überall:** Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown, Einstellungen im NIU-Kopf.
+- **Überall:** Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown (Nummernkreis in den Einstellungen wählbar), Einstellungen im NIU-Kopf.
 
 Das vollständige Inventar mit allem, was es vor dem Rückbau gab, steht in
 [FUNKTIONEN.md](FUNKTIONEN.md).

@@ -29,7 +29,7 @@ US = ROOT / "userscript"
 OUT = ROOT / "dist" / "niu-little-helper.user.js"
 
 # Userscript-Version = Extension-Version + eigener Zähler
-US_REVISION = 1
+US_REVISION = 2
 
 # Globale Namen, die die Bibliotheken bereitstellen und die die Content-Scripts
 # als nackte Bezeichner verwenden.

@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NIU's little helper (Userscript)
 // @namespace    niu.hannes
-// @version      0.59.0.1
+// @version      0.59.0.2
 // @description  NIU-Addon: Userscript-Portierung von NIU's little helper (Wiener Rotes Kreuz, NIU), reduziert auf Kurse, Mitarbeiter-Verwaltung, Memos und Spezialdienste, plus Filter 'nur 8xxx' im Mitarbeiter-Dropdown.
 // @author       Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes
 // @homepageURL  https://github.com/SirFlip/NIU-Addons
@@ -28,7 +28,7 @@
 // Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).
 
 (function () {
-var __VERSION = "0.59.0.1";
+var __VERSION = "0.59.0.2";
 var jQuery, $, moment, PouchDB, createCalendar, PNotify, ClipboardJS, vex;
 var __RES = {
   "img/addCal.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAARCAYAAADQWvz5AAAAAXNSR0IArs4c6QAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAATVJREFUOBGtU0FOwzAQjFPTBNETh4griBtXvlDxA96AxHuQeAM/QP0CUj+A4AeckEjapstM8FrO0iiKwNLWuzPr6XrXyTKzjorijmbgGA7xPmYER7LswmJpPMS7kHTsi+Iewacmwn9TX4VSLPiLXdM8gP+a4acTwV7BtrATGFfq/yB9jHyVe3+1b9t1XpblGYGQqTvD1A90D1O+okauGX/d/02oNzU2cEpl6TCiEEW2TfNohXD/c2J1Xb9bjm9KxUav1orc0KyIjWNFlmAlO5FL/OOCHN7Z0jv3eqiyjrcCGlME/lJj+sAY/roiwcGK8GJX4Ff63R3qHwV0jfZIE8f2WBF7oRMyh54Zz8L0Ug5X7fpHDFNH0nx+65y7pj91ichLu9k8dUI8TLHcudMpQnuRD4rwzDf+tlv83c+fwAAAAABJRU5ErkJggg==",
@@ -187,6 +187,10 @@ var POUCHDB_DB_NAME = "niuhelperdb1";
 
 var STORAGE_KEY_DEKRET_ALERT = "niu_dekret_alert";
 var DEFAULT_DEKRET_ALERT = true;
+
+// Tausenderziffer fuer das Haekchen "nur <Z>xxx" am Mitarbeiter-Dropdown (nur vierstellige Nummern)
+var STORAGE_KEY_DNR_PREFIX = "niu_dnr_prefix";
+var DEFAULT_DNR_PREFIX = "8";
 
 
 // ===== src/content_scripts/lib/var.js =====
@@ -27735,7 +27739,10 @@ __SCRIPTS["userscript/settings.js"] = function () {
     { key: STORAGE_KEY_CACHE_ACTIVE, type: 'checkbox', def: DEFAULT_CACHE_ACTIVE, title: 'Cache',
       label: 'Temporäres Zwischenspeichern der NIU-Anfragen im lokalen Speicher (Empfehlung: Ja)' },
     { key: STORAGE_KEY_DEKRET_ALERT, type: 'checkbox', def: DEFAULT_DEKRET_ALERT, title: 'Mitarbeiter-Detailseite',
-      label: 'Hinweis für nicht ausgefolgte Dekrete' }
+      label: 'Hinweis für nicht ausgefolgte Dekrete' },
+    { key: STORAGE_KEY_DNR_PREFIX, type: 'select', def: DEFAULT_DNR_PREFIX, title: 'Mitarbeiter-Dropdown',
+      options: ['1','2','3','4','5','6','7','8','9'].map(function (z) { return { value: z, text: z + 'xxx' }; }),
+      label: 'Nummernkreis für das Häkchen „nur …xxx“ (nur vierstellige Dienstnummern)' }
   ];
 
   document.title = "NIU-Addon – Einstellungen";
@@ -27762,9 +27769,20 @@ __SCRIPTS["userscript/settings.js"] = function () {
     }
     var row = document.createElement('label');
     row.style.cssText = 'display:block;margin:.3em 0;cursor:pointer;';
-    var input = document.createElement('input');
-    input.type = f.type;
-    input.style.cssText = f.type === 'text' ? 'display:block;margin-bottom:.3em;padding:.3em;width:12em;' : 'margin-right:.5em;vertical-align:middle;';
+    var input;
+    if (f.type === 'select') {
+      input = document.createElement('select');
+      f.options.forEach(function (o) {
+        var opt = document.createElement('option');
+        opt.value = o.value; opt.textContent = o.text;
+        input.appendChild(opt);
+      });
+      input.style.cssText = 'margin-right:.5em;vertical-align:middle;padding:.2em;';
+    } else {
+      input = document.createElement('input');
+      input.type = f.type;
+      input.style.cssText = f.type === 'text' ? 'display:block;margin-bottom:.3em;padding:.3em;width:12em;' : 'margin-right:.5em;vertical-align:middle;';
+    }
     row.appendChild(input);
     row.appendChild(document.createTextNode(f.label));
     box.appendChild(row);
@@ -27791,7 +27809,7 @@ __SCRIPTS["userscript/settings.js"] = function () {
   chrome.storage.sync.get(load, function (items) {
     fields.forEach(function (f) {
       if (f.type === 'checkbox') inputs[f.key].checked = !!items[f.key];
-      else inputs[f.key].value = items[f.key] || '';
+      else inputs[f.key].value = items[f.key] || f.def || '';
     });
   });
 
@@ -27824,12 +27842,18 @@ $(document).ready(function () {
 
 // ===== userscript/nur8xxx.js =====
 __SCRIPTS["userscript/nur8xxx.js"] = function () {
-// Mitarbeiter-Dropdown: Häkchen "nur 8xxx" (ehemals eigenes Userscript "NIU – Mitarbeiter-Dropdown nur 8xxx" v1.1)
+// Mitarbeiter-Dropdown: Häkchen "nur <Z>xxx" (ehemals eigenes Userscript "NIU – Mitarbeiter-Dropdown nur 8xxx" v1.1).
+// Die Tausenderziffer Z kommt aus den Einstellungen (Standard 8); gefiltert werden nur vierstellige Dienstnummern.
 (function () {
   'use strict';
 
-  const KEY = 'niu_nur8xxx';
-  const RX = /\(8\d{3}\)\s*$/;
+  const KEY = 'niu_nur8xxx';   // Ein/Aus-Zustand je Browser (localStorage)
+  let prefix = DEFAULT_DNR_PREFIX;
+  let rx = makeRegex(prefix);
+
+  function makeRegex(z) {
+    return new RegExp('\\(' + z + '\\d{3}\\)\\s*$');
+  }
 
   function install() {
     const s = document.getElementById('m_ddlEmployee');
@@ -27844,12 +27868,13 @@ __SCRIPTS["userscript/nur8xxx.js"] = function () {
     cb.type = 'checkbox';
     cb.style.verticalAlign = 'middle';
     label.appendChild(cb);
-    label.appendChild(document.createTextNode(' nur 8xxx'));
+    const text = document.createTextNode(' nur ' + prefix + 'xxx');
+    label.appendChild(text);
     s.parentNode.insertBefore(label, s.nextSibling);
 
     function apply() {
       const cur = s.value;
-      const keep = cb.checked ? s._all.filter(o => RX.test(o.text)) : s._all;
+      const keep = cb.checked ? s._all.filter(o => rx.test(o.text)) : s._all;
       while (s.options.length) s.remove(0);
       keep.forEach(o => s.add(o));
       const idx = keep.findIndex(o => o.value === cur);
@@ -27864,9 +27889,16 @@ __SCRIPTS["userscript/nur8xxx.js"] = function () {
     try { if (localStorage.getItem(KEY) === '1') { cb.checked = true; apply(); } } catch (e) {}
   }
 
-  install();
-  // Falls das Dropdown erst später (z. B. per Postback) nachgeladen wird
-  new MutationObserver(install).observe(document.body, { childList: true, subtree: true });
+  // Tausenderziffer aus den Einstellungen lesen, dann einhängen
+  const load = {};
+  load[STORAGE_KEY_DNR_PREFIX] = DEFAULT_DNR_PREFIX;
+  chrome.storage.sync.get(load, function (items) {
+    const z = String(items[STORAGE_KEY_DNR_PREFIX] || DEFAULT_DNR_PREFIX);
+    if (/^[1-9]$/.test(z)) { prefix = z; rx = makeRegex(z); }
+    install();
+    // Falls das Dropdown erst später (z. B. per Postback) nachgeladen wird
+    new MutationObserver(install).observe(document.body, { childList: true, subtree: true });
+  });
 })();
 
 };

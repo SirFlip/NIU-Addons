@@ -29,6 +29,18 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   w = load('http://niu/Kripo/Header.aspx#niu-helper-settings', ''); await wait(100);
   inputs = w.document.querySelectorAll('input');
   t('Einstellungen: auf anderem Host wieder geladen', inputs[0].checked === false && inputs[1].checked === true && inputs[2].checked === false);
+  // Nummernkreis umstellen: Einstellung 7 -> Haekchen "nur 7xxx", nur 7001 bleibt
+  w = load('https://niu.wrk.at/Kripo/Header.aspx#niu-helper-settings', ''); await wait(100);
+  const selPrefix = w.document.querySelector('select');
+  t('Einstellungen: Nummernkreis-Auswahl vorhanden, Standard 8', !!selPrefix && selPrefix.value === '8');
+  selPrefix.value = '7'; w.document.querySelector('button').click(); await wait(100);
+  t('Einstellungen: Nummernkreis gespeichert', store['niu_dnr_prefix'] === '"7"');
+  w = load('http://niu/Kripo/Header.aspx', '<select id="m_ddlEmployee"><option value="a">Huber Anna (8123)</option><option value="b">Maier Max (7001)</option><option value="c">Test (71234)</option></select>');
+  await wait(100);
+  const cb7 = w.document.querySelector('#f8000wrap input'); const sel7 = w.document.getElementById('m_ddlEmployee');
+  t('7xxx: Beschriftung folgt der Einstellung', /nur 7xxx/.test(w.document.querySelector('#f8000wrap').textContent));
+  cb7.checked = true; cb7.dispatchEvent(new w.Event('change'));
+  t('7xxx: nur vierstellige 7000er bleiben', [...sel7.options].map(o => o.value).join('') === 'b');
   // staff-lib liest dieselben Werte
   let probe; w = (() => { const d = new JSDOM('<!doctype html><body></body>', { url: 'http://niu/Kripo/Employee/EmployeeDump.aspx', runScripts: 'outside-only', virtualConsole: new VirtualConsole() });
     d.window.GM = { getValue: async (k) => store[k], setValue: async () => {} }; d.window.__NIU_HELPER_TEST__ = (p) => { probe = p; }; d.window.eval(code); return d.window; })();
