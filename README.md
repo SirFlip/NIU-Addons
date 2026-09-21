@@ -2,23 +2,73 @@
 
 ## Installation
 
-Die fertige Datei liegt bei jedem Release unter
-<https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js>.
+Die fertige Datei liegt bei jedem Release unter einer festen Adresse:
 
-**Desktop (Chrome, Edge, Firefox) mit Tampermonkey oder Violentmonkey**
+    https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js
 
-1. Tampermonkey aus dem Store des Browsers installieren.
-2. Den Link oben öffnen. Tampermonkey zeigt die Installationsseite, dort „Installieren“ klicken.
-3. Updates holt Tampermonkey automatisch über die im Script eingetragene `@updateURL`.
+Daneben liegt `niu-little-helper.meta.js` (nur der Kopf mit Versionsnummer).
+Beide Adressen stehen im Script als `@downloadURL` und `@updateURL`, darüber
+laufen die automatischen Updates. Voraussetzung für ein Update ist, dass die
+`@version` im Release höher ist als die installierte.
 
-**iPhone / iPad / Mac Safari mit „Userscripts“**
+### Desktop: Chrome, Edge, Firefox, Safari mit Tampermonkey
 
-1. App „Userscripts“ (quoid) aus dem App Store installieren und in Safari als Erweiterung aktivieren.
-2. Den Link oben in Safari öffnen. Das Userscripts-Symbol in der Adressleiste antippen, dort erscheint das Script zur Installation.
-   Alternativ die Datei in den Userscripts-Ordner in „Dateien“ legen.
-3. Beim ersten Aufruf von NIU im Userscripts-Menü die Erweiterung für `niu.wrk.at` erlauben.
+1. Tampermonkey installieren: [Chrome Web Store](https://chromewebstore.google.com/detail/tampermonkey/dhdgffkkebhmkfjojejmpbldmpobfkfo),
+   [Edge Add-ons](https://microsoftedge.microsoft.com/addons/detail/tampermonkey/iikmkjmpaadaobahmlepeloendndfphd),
+   [Firefox Add-ons](https://addons.mozilla.org/de/firefox/addon/tampermonkey/),
+   [Safari App Store](https://apps.apple.com/app/tampermonkey/id1482490089).
+2. **Nur Chrome und Edge:** unter `chrome://extensions` bzw. `edge://extensions` den
+   **Entwicklermodus** einschalten. Ohne ihn führt Tampermonkey seit Chrome 120
+   keine Userscripts aus.
+3. Die Adresse oben im Browser öffnen. Tampermonkey zeigt die Installationsseite,
+   dort **Installieren** klicken.
+4. NIU neu laden. Im Kopf der Seite erscheint „NIU's little helper ist derzeit aktiv“.
 
-**Einstellungen** erreichst du im NIU-Kopf über „⚙ Einstellungen“ oder das Tampermonkey-Menü.
+**Auto-Update:** Tampermonkey prüft die `@updateURL` standardmäßig etwa einmal
+täglich und installiert neue Versionen ohne Nachfrage. Einstellen unter
+Tampermonkey-Menü → **Dashboard → Einstellungen → Script-Update →
+Prüfintervall**. Sofort prüfen: **Dashboard → Hilfsmittel → Nach Script-Updates
+suchen** oder im Dashboard das Script öffnen und **Nach Updates suchen** wählen.
+
+Violentmonkey funktioniert gleich (Einstellungen → „Auf Updates prüfen“).
+
+### iPhone, iPad und Mac Safari mit „Userscripts“
+
+1. App **Userscripts** von quoid aus dem [App Store](https://apps.apple.com/app/userscripts/id1463298887)
+   laden. Am Mac und am iPhone ist es dieselbe App.
+2. Die Erweiterung einschalten: **Einstellungen → Apps → Safari → Erweiterungen →
+   Userscripts** (iOS) bzw. **Safari → Einstellungen → Erweiterungen** (Mac).
+   Dort den Zugriff auf `niu.wrk.at` (und `niu`, falls im WLAN genutzt) erlauben,
+   am einfachsten „Alle Websites“.
+3. Die App einmal öffnen und einen Ordner für die Scripts wählen (Vorschlag:
+   den vorgeschlagenen iCloud-Ordner „Userscripts“ übernehmen). Ohne Ordner
+   speichert die Erweiterung nichts.
+4. In Safari die Adresse oben öffnen. Safari zeigt den Quelltext. Das
+   Userscripts-Symbol in der Adressleiste (Puzzle-Symbol „Erweiterungen“) antippen,
+   dort **Userscripts** wählen. Die Erweiterung erkennt die `.user.js` und bietet
+   **Install** an.
+   Alternativ die Datei über „Teilen → In Dateien sichern“ direkt in den
+   Userscripts-Ordner legen.
+5. NIU laden und prüfen, ob der Hinweis im Kopf erscheint. Falls nicht: im
+   Userscripts-Popup nachsehen, ob das Script aktiviert ist.
+
+**Auto-Update:** Userscripts liest `@updateURL` und `@downloadURL`. Beim Öffnen
+des Userscripts-Popups in Safari erscheint oben ein Hinweis, wenn eine neuere
+Version vorliegt, ein Tipp auf **Update** installiert sie. Eine stille
+Aktualisierung im Hintergrund wie bei Tampermonkey gibt es dort nicht, es
+braucht den Tipp im Popup. In der App kann man unter **Settings** zusätzlich
+„Check for Updates“ auslösen.
+
+### Neue Version veröffentlichen
+
+1. `US_REVISION` in `build.py` hochzählen (sonst erkennen die Clients kein Update).
+2. `python3 build.py` und die Tests laufen lassen.
+3. Committen, Tag `vX.Y.Z.N` setzen, pushen.
+4. GitHub-Release mit beiden Dateien aus `dist/` anlegen:
+
+       gh release create vX.Y.Z.N dist/niu-little-helper.user.js dist/niu-little-helper.meta.js --title "..." --notes "..."
+
+Die Adresse `releases/latest/download/…` zeigt danach automatisch auf das neue Release.
 
 ## Was das Tool kann
 

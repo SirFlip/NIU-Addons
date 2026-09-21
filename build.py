@@ -29,7 +29,7 @@ US = ROOT / "userscript"
 OUT = ROOT / "dist" / "niu-little-helper.user.js"
 
 # Userscript-Version = Extension-Version + eigener Zähler
-US_REVISION = 2
+US_REVISION = 3
 
 # Globale Namen, die die Bibliotheken bereitstellen und die die Content-Scripts
 # als nackte Bezeichner verwenden.
@@ -173,7 +173,7 @@ def main():
         ("author", "Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes"),
         ("homepageURL", "https://github.com/SirFlip/NIU-Addons"),
         ("supportURL", "https://github.com/SirFlip/NIU-Addons/issues"),
-        ("updateURL", "https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js"),
+        ("updateURL", "https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.meta.js"),
         ("downloadURL", "https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js"),
         ("match", "*://niu/*"),
         ("match", "*://niu.wrk.at/*"),
@@ -191,6 +191,7 @@ def main():
     for k, v in meta:
         w("// @%-12s %s" % (k, v))
     w("// ==/UserScript==")
+    header = "\n".join(out) + "\n"
     w("")
     w("// AUTOMATISCH ERZEUGT von build.py - nicht von Hand ändern, sondern die")
     w("// Quellen in extension/ bzw. userscript/ anpassen und neu bauen.")
@@ -302,6 +303,10 @@ def main():
     out_path = ROOT / "test" / "build-test.user.js" if "--test" in sys.argv else OUT
     out_path.parent.mkdir(exist_ok=True)
     out_path.write_text("\n".join(out) + "\n", encoding="utf-8")
+    if "--test" not in sys.argv:
+        meta_path = out_path.with_name("niu-little-helper.meta.js")
+        meta_path.write_text(header, encoding="utf-8")
+        print("OK  %s  (nur Metadaten, fuer @updateURL)" % meta_path.relative_to(ROOT))
     print("OK  %s  (%.2f MB, Version %s)" % (out_path.relative_to(ROOT), out_path.stat().st_size / 1e6, version))
     print("    %d Bibliotheken, %d Seiten-Skripte, %d CSS, %d Ressourcen, %d Regeln"
           % (len(lib_order), len(script_order), len(css_order), len(res), len(entries)))
