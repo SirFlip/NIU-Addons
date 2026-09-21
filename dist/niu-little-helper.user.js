@@ -27650,7 +27650,7 @@ __SCRIPTS["src/content_scripts/menu.js"] = function () {
     if (!tree || !tree.getRoot) { return false; }
     var section = tree.getRoot().childList.filter(function (n) { return n.data.title === SECTION; })[0];
     if (!section) { return false; }
-    var node = section.addChild({ title: TITLE, href: HREF, target: 'main' });
+    var node = section.addChild({ title: TITLE, href: HREF, target: 'main', icon: false });  // wie die anderen Eintraege: kein Icon
     var before = null;
     section.childList.some(function (n, i) {
       if (n.data.title === AFTER) { before = section.childList[i + 1] || null; return true; }
