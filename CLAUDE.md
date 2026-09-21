@@ -9,10 +9,10 @@ Upstream: https://github.com/geraldbaeck/NIUsLittleHelper (Unlicense). Verweise 
 in README, `build.py`-Header und Release-Notizen müssen erhalten bleiben.
 
 NIU wird schrittweise abgelöst. Der große Rückbau (Dienstplan, Ambulanzen, Dienststatistik, Kursanmeldung,
-Word-Vorlagen, Mitarbeiter Neu, Confluence) ist mit 0.59.0 umgesetzt. `FUNKTIONEN.md` ist das Inventar aller
-Funktionen mit IDs (D1, P4, K5 …), Zustand, Abhängigkeiten und der Entscheidung; Abschnitt 8 zeigt, was
-entfernt wurde, Abschnitt 9 die offenen To-dos. Bei weiteren Streichungen die IDs verwenden und Abschnitt 4
-(welche Fremdbibliothek mit welchem Feature entfällt) beachten.
+Word-Vorlagen, Mitarbeiter Neu, Confluence) ist mit 0.59.0 umgesetzt. `FUNKTIONEN.md` beschreibt den aktuellen
+Stand: alle Funktionen mit IDs (H1, K2, P8 …), Zustand, Datenquellen; Abschnitt 8 listet, was seit 0.58 entfernt
+wurde, Abschnitt 9 die offenen Punkte. Nach Änderungen an Funktionen die Datei mitpflegen. Das alte Inventar mit
+Entscheidungsspalte: `git show v0.58.3.3:FUNKTIONEN.md`.
 
 ## Befehle
 
