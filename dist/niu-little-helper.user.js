@@ -26955,6 +26955,12 @@ $(document).ready(function() {
   });
 
   if (tabelle.length == 0) {
+    // Beim ersten Aufruf (noch keine Ergebnisse) das von NIU vorbelegte "Nur abgeschlossene Kurse" abwaehlen.
+    // Nach einer Suche (Tabelle vorhanden) bleibt die Auswahl des Benutzers unangetastet.
+    var nurAbgeschlossen = $("#ctl00_main_m_Options label:contains('abgeschlossene')");
+    var cbAbgeschlossen = nurAbgeschlossen.length ? $("#" + nurAbgeschlossen.attr("for")) : $("#ctl00_main_m_Options_0");
+    cbAbgeschlossen.prop("checked", false);
+
     load = {};
     load[STORAGE_KEY_SEARCH_COURSE_ALWAYS_SEARCH] = DEFAULT_SEARCH_COURSE_ALWAYS_SEARCH;
     chrome.storage.sync.get(load, function(item) {
