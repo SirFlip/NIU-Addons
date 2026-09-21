@@ -52,8 +52,8 @@ Legende
 | T1 | Link „Meinen Dienstplan für die nächsten 14 Tage herunterladen“ | ICS-Datei mit allen Diensten und Ambulanzen der Startseite | DOM + ics.js | FRAGIL: wartet nicht auf die Ambulanz-Abfragen, Datei kann unvollständig sein | **weg** (Dienste/Ambulanzen nicht mehr in NIU) |
 | T2 | Kalender-Button je Dienst (Google/iCal/Outlook) | Titel = Dienstart, bei RTW/KTW mit Fahrzeug, Adresse aus `department` | DOM, var.js | OK | **weg** |
 | T3 | Kalender-Button je Ambulanz | Holt je Ambulanz die Detailseite per AJAX für Webinfo und Ort | AJAX `AmbulancesDetail.aspx` | OK | **weg** |
-| T4 | Kalender-Button je Kurs | Aus der Kurstabelle, nicht in der ICS-Datei enthalten | DOM | OK | **prüfen** (nur sinnvoll, wenn die Startseite noch Kurse zeigt) |
-| T5 | Links in Ambulanz-/Kurstabelle öffnen in eigenem Fenster | `target=wrk_todayDetail` | – | OK | **prüfen** (wie T4) |
+| T4 | Kalender-Button je Kurs | Aus der Kurstabelle, nicht in der ICS-Datei enthalten | DOM | OK | **behalten** (Startseite zeigt weiterhin Kurse) |
+| T5 | Links in Ambulanz-/Kurstabelle öffnen in eigenem Fenster | `target=wrk_todayDetail` | – | OK | **behalten** (nur noch für die Kurstabelle) |
 | T6 | Wunschmeldung-Styling | Hellblau/kursiv, Beschriftung „Wunschmeldung“ | DOM | OK | **weg** |
 | T7 | Kollegen-Fotos, Mail/WhatsApp je Dienstpartner | Auskommentiert („vorerst deaktiviert“), aber die AJAX-Abfragen an `shortemployee.aspx` laufen noch für jeden Dienstpartner ins Leere | AJAX | TOT + unnötige Last | **weg** (tot) |
 
@@ -103,18 +103,17 @@ Legende
 | K2 | Autosuche | Beim Aufruf sofort alle Kurse heute bis +12 Monate suchen (Optionen Qualifikationen, Stornos, Anrechnung, E-Learning, Warteliste); abschaltbar in den Einstellungen | DOM, Storage | OK | **behalten** |
 | K3 | DataTable statt NIU-Tabelle | Volltextsuche, Sortierung inkl. Datum, kein Paging, Link „öffnen“ in neuem Tab | DOM, DataTables | FRAGIL: bricht hart ab, wenn NIU die Spaltenzahl ändert | **behalten** |
 | K4 | Vorfilter-Leiste | Nur freie Plätze, §50, §50 Reanimation, §51 Rezertifizierung, nur/keine Anrechnungskurse, SAN-Basiskurse, keine SAN-Kurse, FSD, KHD, FKR, Pflichtfortbildungen (RD-Fortbildung) | DataTables | FRAGIL (Kursnamen hart kodiert) | **behalten** |
-| K5 | Link „anmelden“/„abmelden“ | mailto an Ausbildungs-Postfach je Dienstnummernbereich (west/vs/bvs/ddl/nord/LRK) mit vorausgefülltem Betreff und Text; bei Storno sofort ein `alert` beim Laden | AJAX `Header.aspx` (eigene DNr), PouchDB | FRAGIL (Mailadressen hart kodiert) | **behalten** (Mailadressen der Ausbildungen prüfen) |
+| K5 | Link „anmelden“/„abmelden“ | mailto an Ausbildungs-Postfach je Dienstnummernbereich (west/vs/bvs/ddl/nord/LRK) mit vorausgefülltem Betreff und Text; bei Storno sofort ein `alert` beim Laden | AJAX `Header.aspx` (eigene DNr), PouchDB | FRAGIL (Mailadressen hart kodiert) | **weg** (Kursan-/abmeldung machen die Leute jetzt selbst) |
 | K6 | Kalenderansicht | Nur Kommentar „NOCH VIEL ARBEIT“ | – | TOT | **weg** (tot) |
 
 ### 2.6 Kursdetails – CourseDetail.js (188 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| C1 | Letzte Kostenstelle merken | Select wird auf zuletzt gewählte Kostenstelle gesetzt | Storage `letzte_kostenstelle` | OK | **behalten** |
-| C2 | Kürzel automatisch in „Bemerkung“ | Aus Einstellung „Kürzel“ | Storage | OK | **behalten** |
-| C3 | Mitarbeiter-Autocomplete | Ersetzt das Mitarbeiter-Select durch ein Suchfeld (Name oder Dienstnummer) | DOM, jQuery UI | FRAGIL (Auswahl über Teilstring) | **behalten** |
+| C1 | Letzte Kostenstelle merken | Select wird auf zuletzt gewählte Kostenstelle gesetzt | Storage `letzte_kostenstelle` | OK | **weg** (gehört zum Anmeldeformular) |
+| C2 | Kürzel automatisch in „Bemerkung“ | Aus Einstellung „Kürzel“ | Storage | OK | **weg** (gehört zum Anmeldeformular) |
+| C3 | Mitarbeiter-Autocomplete | Ersetzt das Mitarbeiter-Select durch ein Suchfeld (Name oder Dienstnummer) | DOM, jQuery UI | FRAGIL (Auswahl über Teilstring) | **weg** (gehört zum Anmeldeformular) |
 | C4 | Kalender-Export | Unter der Überschrift (bei einem Termin) und je Termin in der Termintabelle | DOM, ouical | OK | **behalten** |
-
 ### 2.7 Offene Ambulanz-Positionen – AmbulancesOpenPositions.js (292 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
@@ -212,9 +211,8 @@ Menü → Verwaltung / EDV:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| SP1 | Spezialdienst-Eingabe vorbefüllen | Datum heute, Endzeit jetzt, Kennziffer „Admin_BS_Funkt“, Listeneingabe angehakt | DOM | OK, Kennziffer hart kodiert | **prüfen** (läuft Spezialdiensterfassung noch in NIU?) |
-| SP2 | Unterschreiben: Button „OK“ im Tabellenkopf | Hakt alle OK-Checkboxen an | DOM | OK; `spezialdienstUnterschreiben.html` (Menü „alle genehmigen/ablehnen“) wird nie geladen | **prüfen** (wie SP1) |
-
+| SP1 | Spezialdienst-Eingabe vorbefüllen | Datum heute, Endzeit jetzt, Kennziffer „Admin_BS_Funkt“, Listeneingabe angehakt | DOM | OK, Kennziffer hart kodiert | **behalten** (Spezialdienste werden weiter in NIU erfasst) |
+| SP2 | Unterschreiben: Button „OK“ im Tabellenkopf | Hakt alle OK-Checkboxen an | DOM | OK; `spezialdienstUnterschreiben.html` (Menü „alle genehmigen/ablehnen“) wird nie geladen | **behalten** (wie SP1) |
 ### 2.15 Kopfzeile, Einstellungen, Dropdown
 
 | # | Funktion | Was es tut | Zustand | Entscheidung |
@@ -230,9 +228,8 @@ Menü → Verwaltung / EDV:
 
 | # | Funktion | Was es tut | Zustand | Entscheidung |
 |---|---|---|---|---|
-| I1 | Bescheiderstellung: Word-Vorlage füllen | Liest Feldnamen aus `#i_fieldnames`, `#i_filename`, `#i_dropdowns` der Confluence-Seite, füllt hochgeladene .docx, Download | OK, nur wenn die Confluence-Seite diese Felder noch hat | **prüfen** (Confluence, unabhängig von NIU; behalten, falls die Seite noch genutzt wird) |
-| I2 | Fahrzeugtagebuch: Status-Filter und Farbcodierung | Checkboxen je Status im Tabellenkopf, Priorität farbig, nicht gewählte Listeneinträge ausgeblendet; Kategorie-/Prioritätsfilter auskommentiert | OK / teilweise TOT | **prüfen** (wie I1) |
-
+| I1 | Bescheiderstellung: Word-Vorlage füllen | Liest Feldnamen aus `#i_fieldnames`, `#i_filename`, `#i_dropdowns` der Confluence-Seite, füllt hochgeladene .docx, Download | OK, nur wenn die Confluence-Seite diese Felder noch hat | **weg** (Confluence, nicht mehr gebraucht) |
+| I2 | Fahrzeugtagebuch: Status-Filter und Farbcodierung | Checkboxen je Status im Tabellenkopf, Priorität farbig, nicht gewählte Listeneinträge ausgeblendet; Kategorie-/Prioritätsfilter auskommentiert | OK / teilweise TOT | **weg** (Confluence, nicht mehr gebraucht) |
 ---
 
 ## 3. Gemeinsame Bibliotheken (eigener Code)
@@ -350,57 +347,72 @@ Alle Postback-Parser hängen an WebForms-Feldnamen (`ctl00$main$…`, Options-In
 
 ---
 
-## 8. Vorschlag zur Vorsortierung (2026-09-21)
+## 8. Vorsortierung (Stand 2026-09-21, noch nicht umgesetzt)
 
 Ausgangslage laut Besitzer: Dienstplanung (Dienstplan **und** Ambulanzen) läuft
-in einem anderen System. Kurse und Kurssuche bleiben in NIU. Die
-Mitarbeiter-Erfassung bleibt in NIU.
+in einem anderen System. Kurse und Kurssuche bleiben in NIU, die Startseite zeigt
+die Kurstabelle weiterhin. Kursan- und -abmeldung erledigen die Leute inzwischen
+selbst, alles dazu kann weg. Die Mitarbeiter-Erfassung und die
+Spezialdiensterfassung bleiben in NIU. Die Confluence-Erweiterungen werden nicht
+mehr gebraucht.
 
-### Weg (Vorschlag)
+### Weg
 
-| Modul | Begründung |
+| Modul / IDs | Begründung |
 |---|---|
-| DutyRoster.js (D1–D15) | Dienstplan ist nicht mehr in NIU |
-| AmbulancesOpenPositions.js (A1–A4), AmbulancesEdit.js (E1–E5) | Ambulanzen sind nicht mehr in NIU |
-| today.js (T1–T3, T6, T7) | Kalender-Export und ICS betreffen Dienste und Ambulanzen; T4/T5 siehe „prüfen“ |
-| EmployeeDutyStatistic.js (S1–S7) | Statistik der alten Dienstplandaten; nur behalten, wenn Alt-Daten noch angesehen werden |
-| EmployeeDump P4–P7 | Dienststatistik-Spalten; Parser kennt ohnehin nur alte Dienstart-Namen |
-| EmployeeDump P11, P19 | kaputt bzw. redundant zu newEmployee N1 |
-| Toter Code | K6, H5, H6, `dienststellenKuerzel`, `docImage`, `spezialdienstUnterschreiben.html`, Duplikate aus Abschnitt 7 |
+| DutyRoster.js (D1–D15) komplett | Dienstplan ist nicht mehr in NIU |
+| AmbulancesOpenPositions.js (A1–A4), AmbulancesEdit.js (E1–E5) komplett | Ambulanzen sind nicht mehr in NIU |
+| today.js: T1, T2, T3, T6, T7 | ICS-Download und Kalender-Export betreffen Dienste und Ambulanzen; T4/T5 bleiben |
+| EmployeeDutyStatistic.js (S1–S7) komplett | Statistik der alten Dienstplandaten |
+| SearchCourse.js: K5, K6 | Anmelde-/Abmelde-Mail nicht mehr nötig (Self-Service); K6 tot |
+| CourseDetail.js: C1, C2, C3 | Kostenstelle, Kürzel und Mitarbeiter-Autocomplete gehören zum Anmeldeformular |
+| EmployeeDump.js: P4–P7, P11, P19 | Dienststatistik-Spalten (Dienstdaten nicht mehr in NIU), No-Shows kaputt, freie DNr redundant zu N1 |
+| vfm-bescheiderstellung.js (I1), viewpage.action.js (I2) komplett | Confluence-Erweiterungen nicht mehr gebraucht |
+| ControlCenter.js (H5), background.js (H6) | leer bzw. nur Extension |
 | Einstellung „Autocomplete-Felder im Dienstplan“ | hängt nur an D13 |
+| Toter Code | `dienststellenKuerzel`, `docImage`, `spezialdienstUnterschreiben.html`, `_queryEmployee`, `_getEmailsfromEmployeeData`, Duplikate aus Abschnitt 7 |
 
-### Behalten (Vorschlag)
+### Behalten
 
-| Modul | Begründung |
+| Modul / IDs | Begründung |
 |---|---|
-| SearchCourse.js (K1–K5), CourseDetail.js (C1–C4) | Kurse und Kurssuche bleiben in NIU |
+| today.js: T4, T5 | Kalender-Export je Kurs und Kurslinks in eigenem Fenster |
+| SearchCourse.js: K1–K4 | Kurssuche mit Autosuche, Tabelle und Vorfiltern |
+| CourseDetail.js: C4 | Kalender-Export je Kurstermin |
 | LVStatistic.js (L1) | wird aktiv genutzt, im September 2026 angepasst, Test vorhanden |
-| EmployeeDump ohne Dienststatistik (P1–P3, P8–P10, P12–P18) | Mitarbeiter-Verwaltung: Ausbildungen, Berechtigungen, Schlüssel, Stammdaten, Sammel-Mail/-Memo |
+| EmployeeDump.js: P1–P3, P8–P10, P12–P18 | Mitarbeiter-Verwaltung: Ausbildungen, Berechtigungen, Schlüssel, Stammdaten, Sammel-Mail/-Memo |
 | newEmployee.js (N1, N2), detailEmployee.js (M1–M3) | Mitarbeiter-Erfassung |
 | shortemployee.js, summaryemployee.js (V1–V3) | VCF-Download der Mitarbeiterseiten |
 | memo_last.js, memo_erinnerung.js (ML1–ML3) | Memos gehören zur Mitarbeiter-Verwaltung |
+| Spezialdiensteingabe.js (SP1), spezialdienstUnterschreiben.js (SP2) | Spezialdienste werden weiter in NIU erfasst |
 | Header.js, header-extras.js, settings.js, nur8xxx.js (H1–H4) | Grundgerüst des Userscripts |
 
-### Prüfen
+### Folgen für Bibliotheken und gemeinsamen Code
 
-| ID | Frage |
-|---|---|
-| T4, T5 | Zeigt die Startseite noch die Kurstabelle? Dann Kalender-Export je Kurs behalten, sonst today.js komplett weg. |
-| SP1, SP2 | Läuft die Spezialdiensterfassung (`/df/…`, `/TNG/…`) noch in NIU oder ist sie mit der Dienstplanung umgezogen? |
-| I1, I2 | Werden die Confluence-Seiten Bescheiderstellung und Fahrzeugtagebuch noch genutzt? Unabhängig von NIU. |
-| K5 | Stimmen die Ausbildungs-Postfächer je Dienstnummernbereich noch? |
+Entfallen komplett: **ics.js**, **SheetJS** (ca. 1 MB), **spin.js**, **Chartist**, **jQuery UI** (letzter Nutzer war
+C3; das jQuery-UI-Menü in EmployeeDump/newEmployee muss dann durch ein einfaches Menü ersetzt werden, oder jQuery UI bleibt).
+Bleiben: jQuery, PouchDB, DataTables + datetime-moment, moment (SearchCourse), ouical (T4, C4), jquery-modal (M3),
+vex (EmployeeDump), PNotify (M1), ClipboardJS (M2), docxtemplater/JSZip/JSZip-Utils/FileSaver (M3).
 
-### Folgen für Bibliotheken und gemeinsamen Code, wenn „weg“ so umgesetzt wird
+staff-lib.js: `calculateDutyStatistic`, `DutyCount`, `DUTY_TYPES`, `getLastDuty`, `expDFActive`, `getOperableDNRs`,
+`convertDFField`, `makeEmployeeSearchField(+Overlay)`, `getEmployeeCourses` (nur P11) entfallen; `getKuerzel` nur noch
+für M3; `getOwnDNRs` nur noch für M3 und P3. Die Zahl der `niu.wrk.at`-URLs sinkt, Zähler in `build.py` anpassen.
+lib.js: `getDuties`, `getHeaderNumber`, `getEmployeeDataFromLink`, `getDurationFromTimeString`, `getDefaultPhone`,
+`getDefaultEmail`, `getAllEmails`, `parseHTMLOnly`, `createCalElement` entfallen (T4 hat eine eigene Variante,
+CourseDetail ebenfalls; eine davon nach lib.js ziehen).
+var.js: `dienstTypen`, `mailImage`, `whatsappImage`, `xlsxImage` entfallen; `department` bleibt für T4.
+definitions.js/settings.js: Option „Autocomplete-Felder im Dienstplan“ und die ungenutzten Cache-Zeit-Konstanten entfernen;
+Einstellung „Kürzel“ bleibt für M3.
+manifest.json: Einträge DutyRoster, Ambulances*, EmployeeDutyStatistic, ControlCenterHead und beide Intranet-Einträge
+streichen; `@match`-Zeilen für intranet.wrk.at in build.py entfernen; überflüssige Lib-Ladungen aus Abschnitt 4 bereinigen.
+Tests: smoke.js-Fälle für AmbulancesEdit, EmployeeDutyStatistic und Confluence entfernen bzw. auf „kein Modul startet“ umstellen.
 
-Entfallen komplett: **ics.js**, **SheetJS** (ca. 1 MB), **spin.js**, **Chartist**.
-Bleiben: jQuery, jQuery UI (CourseDetail C3, EmployeeDump-Menü), PouchDB, DataTables (SearchCourse, EmployeeDump),
-moment (SearchCourse), ouical (CourseDetail C4, ggf. T4), jquery-modal, vex, PNotify, ClipboardJS,
-docxtemplater/JSZip/FileSaver.
+---
 
-staff-lib.js: `calculateDutyStatistic`, `DutyCount`, `DUTY_TYPES`, `getLastDuty`, `expDFActive`,
-`getOperableDNRs`, `convertDFField` entfallen; die Zahl der `niu.wrk.at`-URLs sinkt, Zähler in `build.py` anpassen.
-lib.js: `getDuties`, `getHeaderNumber`, `getEmployeeDataFromLink`, `getDefaultPhone`, `getDefaultEmail`,
-`getAllEmails`, `parseHTMLOnly`, `createCalElement` entfallen; `getDurationFromTimeString` nur noch, falls S1 bleibt.
-var.js: `department`, `dienstTypen`, `mailImage`, `whatsappImage`, `xlsxImage` entfallen (falls T2–T4 weg).
-manifest.json: die Einträge DutyRoster, Ambulances*, EmployeeDutyStatistic, Today (falls komplett weg) und
-ControlCenterHead streichen; überflüssige Lib-Ladungen aus Abschnitt 4 bereinigen.
+## 9. Offene To-dos (unabhängig vom Rückbau)
+
+- **„nur 8xxx“ für andere Nummernkreise:** Das Häkchen am Mitarbeiter-Dropdown filtert fest auf 8000–8999
+  (`userscript/nur8xxx.js`, Regex `\(8\d{3}\)`). Gewünscht ist eine Auswahl des Nummernkreises, z. B. über die
+  Einstellungsseite (Bereich eintragen oder aus den vorhandenen Tausenderbereichen wählen), Zustand weiterhin merken.
+- P2: Platzhalter-Empfänger `test@example.com` durch die richtige Adresse ersetzen oder das Feld leer lassen.
+- P9: Kurs-IDs der Pflichtfortbildungen und die Cache-Versionen `pfb7`/`grk4` beim Ändern hochzählen.
