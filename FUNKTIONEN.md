@@ -2,8 +2,9 @@
 
 Stand: Extension 0.58.3 / Userscript 0.58.3.2 (September 2026).
 Zweck: Entscheidungsgrundlage, welche Funktionen beim Umbau bleiben und welche
-entfallen, weil NIU schrittweise abgelöst wird. Die Spalte **Entscheidung** ist
-zum Ausfüllen gedacht (behalten / weg / später).
+entfallen, weil NIU schrittweise abgelöst wird. Die Spalte **Entscheidung**
+enthält seit 2026-09-21 einen **Vorschlag** (behalten / weg / prüfen), siehe
+Abschnitt 8. Bis zur Freigabe ist nichts davon umgesetzt.
 
 Legende
 - **Zielgruppe:** MA = alle Mitarbeiter, FU = Funktionäre / Dienstführung / Kommando
@@ -48,106 +49,106 @@ Legende
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| T1 | Link „Meinen Dienstplan für die nächsten 14 Tage herunterladen“ | ICS-Datei mit allen Diensten und Ambulanzen der Startseite | DOM + ics.js | FRAGIL: wartet nicht auf die Ambulanz-Abfragen, Datei kann unvollständig sein | |
-| T2 | Kalender-Button je Dienst (Google/iCal/Outlook) | Titel = Dienstart, bei RTW/KTW mit Fahrzeug, Adresse aus `department` | DOM, var.js | OK | |
-| T3 | Kalender-Button je Ambulanz | Holt je Ambulanz die Detailseite per AJAX für Webinfo und Ort | AJAX `AmbulancesDetail.aspx` | OK | |
-| T4 | Kalender-Button je Kurs | Aus der Kurstabelle, nicht in der ICS-Datei enthalten | DOM | OK | |
-| T5 | Links in Ambulanz-/Kurstabelle öffnen in eigenem Fenster | `target=wrk_todayDetail` | – | OK | |
-| T6 | Wunschmeldung-Styling | Hellblau/kursiv, Beschriftung „Wunschmeldung“ | DOM | OK | |
-| T7 | Kollegen-Fotos, Mail/WhatsApp je Dienstpartner | Auskommentiert („vorerst deaktiviert“), aber die AJAX-Abfragen an `shortemployee.aspx` laufen noch für jeden Dienstpartner ins Leere | AJAX | TOT + unnötige Last | |
+| T1 | Link „Meinen Dienstplan für die nächsten 14 Tage herunterladen“ | ICS-Datei mit allen Diensten und Ambulanzen der Startseite | DOM + ics.js | FRAGIL: wartet nicht auf die Ambulanz-Abfragen, Datei kann unvollständig sein | **weg** (Dienste/Ambulanzen nicht mehr in NIU) |
+| T2 | Kalender-Button je Dienst (Google/iCal/Outlook) | Titel = Dienstart, bei RTW/KTW mit Fahrzeug, Adresse aus `department` | DOM, var.js | OK | **weg** |
+| T3 | Kalender-Button je Ambulanz | Holt je Ambulanz die Detailseite per AJAX für Webinfo und Ort | AJAX `AmbulancesDetail.aspx` | OK | **weg** |
+| T4 | Kalender-Button je Kurs | Aus der Kurstabelle, nicht in der ICS-Datei enthalten | DOM | OK | **prüfen** (nur sinnvoll, wenn die Startseite noch Kurse zeigt) |
+| T5 | Links in Ambulanz-/Kurstabelle öffnen in eigenem Fenster | `target=wrk_todayDetail` | – | OK | **prüfen** (wie T4) |
+| T6 | Wunschmeldung-Styling | Hellblau/kursiv, Beschriftung „Wunschmeldung“ | DOM | OK | **weg** |
+| T7 | Kollegen-Fotos, Mail/WhatsApp je Dienstpartner | Auskommentiert („vorerst deaktiviert“), aber die AJAX-Abfragen an `shortemployee.aspx` laufen noch für jeden Dienstpartner ins Leere | AJAX | TOT + unnötige Last | **weg** (tot) |
 
 ### 2.2 Dienstplan – DutyRoster.js (501 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| D1 | Checkbox „Leerzeilen filtern“ | Unbesetzte, nicht meldbare Dienste ausblenden | DOM | OK | |
-| D2 | Checkbox „nur NKTW“ | Bemerkung enthält NKTW, N-KTW, Notfall-KTW, RKK | DOM | FRAGIL (alte Bezeichnungen) | |
-| D3 | Checkbox „nur Kurzdienste“ | CSS-Klasse `Short` der Zeitzelle | DOM | OK | |
-| D4 | Checkbox „nur eigene Dienste“ | Abgleich mit eigenen Dienstnummern aus dem Vorschlags-Dropdown | DOM | OK | |
-| D5 | Checkbox „nur PAL Dienste“ | Spalte PAL | DOM | OK | |
-| D6 | Radio Tag-/Nacht-/Alle Dienste | CSS-Klasse `Day`/`Night` | DOM | OK | |
-| D7 | Select „nur HA/West/DDL/VS/Nord/BVS Permanenzen“ | Nur sichtbar, wenn Dienstart „RK“ im Namen hat | DOM | FRAGIL (alte Dienstart-Namen RKL/RKS) | |
-| D8 | Checkboxen „Nur meldbare Dienste als: Fahrer/SAN1/SAN2 …“ | Eine Checkbox je Funktionsspalte | DOM | OK | |
-| D9 | Wochentags-Checkboxen Mo–So | Filter über Spalte Tag | DOM | OK | |
-| D10 | Link „DF einblenden/ausblenden“ | Dienstführungs-Tabelle standardmäßig versteckt | DOM | OK | |
-| D11 | Link „Suchoptionen einblenden“ / ✖ | NIU-Suchbox und Filterblock aus-/einblenden | DOM | OK | |
-| D12 | Kalender-Export je eigenem Dienst | ouical-Button in letzter Spalte, nur bei eigenen Diensten sichtbar; nach „Melden“ per MutationObserver nachgezogen | DOM, var.js | OK | |
-| D13 | Autocomplete in DF-Bearbeitungsfeldern | Nur bei Option „Autocomplete-Felder im Dienstplan“ (Standard aus); lädt alle bedienbaren Mitarbeiter aus `ControlCenterHead.aspx` | AJAX, PouchDB | experimentell | |
-| D14 | Checkbox „nur Permanenzen“ | Auskommentiert, `isPermanenz` wird nie gesetzt | – | TOT | |
-| D15 | `readValuefromStorage`/`saveValueToStorage` | Nie aufgerufen, Rückgabe kaputt | – | TOT | |
+| D1 | Checkbox „Leerzeilen filtern“ | Unbesetzte, nicht meldbare Dienste ausblenden | DOM | OK | **weg** (Dienstplan in anderem System) |
+| D2 | Checkbox „nur NKTW“ | Bemerkung enthält NKTW, N-KTW, Notfall-KTW, RKK | DOM | FRAGIL (alte Bezeichnungen) | **weg** |
+| D3 | Checkbox „nur Kurzdienste“ | CSS-Klasse `Short` der Zeitzelle | DOM | OK | **weg** |
+| D4 | Checkbox „nur eigene Dienste“ | Abgleich mit eigenen Dienstnummern aus dem Vorschlags-Dropdown | DOM | OK | **weg** |
+| D5 | Checkbox „nur PAL Dienste“ | Spalte PAL | DOM | OK | **weg** |
+| D6 | Radio Tag-/Nacht-/Alle Dienste | CSS-Klasse `Day`/`Night` | DOM | OK | **weg** |
+| D7 | Select „nur HA/West/DDL/VS/Nord/BVS Permanenzen“ | Nur sichtbar, wenn Dienstart „RK“ im Namen hat | DOM | FRAGIL (alte Dienstart-Namen RKL/RKS) | **weg** |
+| D8 | Checkboxen „Nur meldbare Dienste als: Fahrer/SAN1/SAN2 …“ | Eine Checkbox je Funktionsspalte | DOM | OK | **weg** |
+| D9 | Wochentags-Checkboxen Mo–So | Filter über Spalte Tag | DOM | OK | **weg** |
+| D10 | Link „DF einblenden/ausblenden“ | Dienstführungs-Tabelle standardmäßig versteckt | DOM | OK | **weg** |
+| D11 | Link „Suchoptionen einblenden“ / ✖ | NIU-Suchbox und Filterblock aus-/einblenden | DOM | OK | **weg** |
+| D12 | Kalender-Export je eigenem Dienst | ouical-Button in letzter Spalte, nur bei eigenen Diensten sichtbar; nach „Melden“ per MutationObserver nachgezogen | DOM, var.js | OK | **weg** |
+| D13 | Autocomplete in DF-Bearbeitungsfeldern | Nur bei Option „Autocomplete-Felder im Dienstplan“ (Standard aus); lädt alle bedienbaren Mitarbeiter aus `ControlCenterHead.aspx` | AJAX, PouchDB | experimentell | **weg** |
+| D14 | Checkbox „nur Permanenzen“ | Auskommentiert, `isPermanenz` wird nie gesetzt | – | TOT | **weg** |
+| D15 | `readValuefromStorage`/`saveValueToStorage` | Nie aufgerufen, Rückgabe kaputt | – | TOT | **weg** |
 
 ### 2.3 Dienststatistik – EmployeeDutyStatistic.js (236 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| S1 | Spalte „Dauer“ je Dienst | Stunden aus Von/Bis | DOM | OK | |
-| S2 | Tortendiagramm „Dienst auf:“ | Verteilung nach Dienststelle | DOM, Chartist | OK | |
-| S3 | Tortendiagramm „Dienst als:“ | SEF/SAN1/SAN2 über feste Spaltenindizes (geplant 4/5/6, fixiert 5/6/7) | DOM, Chartist | FRAGIL | |
-| S4 | Tabelle „Übersicht“ | Anzahl, Gesamtdauer, Durchschnitt | DOM | OK | |
-| S5 | Tabelle „Top KollegInnen“ | Top 5 Namen aus den Funktionsspalten | DOM | FRAGIL (Kollegen ohne Link fallen raus) | |
-| S6 | `filterTable()` | Kopie aus AmbulancesOpenPositions, nie aufgerufen | – | TOT | |
-| S7 | Wochentag-Diagramm | Auskommentiert | – | TOT | |
+| S1 | Spalte „Dauer“ je Dienst | Stunden aus Von/Bis | DOM | OK | **weg** (Alt-Statistik; nur behalten, wenn jemand die historischen Dienste noch ansieht) |
+| S2 | Tortendiagramm „Dienst auf:“ | Verteilung nach Dienststelle | DOM, Chartist | OK | **weg** |
+| S3 | Tortendiagramm „Dienst als:“ | SEF/SAN1/SAN2 über feste Spaltenindizes (geplant 4/5/6, fixiert 5/6/7) | DOM, Chartist | FRAGIL | **weg** |
+| S4 | Tabelle „Übersicht“ | Anzahl, Gesamtdauer, Durchschnitt | DOM | OK | **weg** |
+| S5 | Tabelle „Top KollegInnen“ | Top 5 Namen aus den Funktionsspalten | DOM | FRAGIL (Kollegen ohne Link fallen raus) | **weg** |
+| S6 | `filterTable()` | Kopie aus AmbulancesOpenPositions, nie aufgerufen | – | TOT | **weg** |
+| S7 | Wochentag-Diagramm | Auskommentiert | – | TOT | **weg** |
 
 ### 2.4 LV-Statistik – LVStatistic.js (125 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| L1 | Zusatztabelle „Gruppiert nach Funktion und Dienstart“ | Summen je Gruppe (Support, KTW, RTW, Leitstelle, KHD, BT-SAN, Ausbildung, Ambulanzen, Sonstiges, Bezirksstelle) und Funktion, mit Gesamtzeile; Spalte „Gruppiert zu“ in der Originaltabelle | DOM | OK, bereits an neue Dienstart-Namen angepasst, durch Test abgedeckt | |
+| L1 | Zusatztabelle „Gruppiert nach Funktion und Dienstart“ | Summen je Gruppe (Support, KTW, RTW, Leitstelle, KHD, BT-SAN, Ausbildung, Ambulanzen, Sonstiges, Bezirksstelle) und Funktion, mit Gesamtzeile; Spalte „Gruppiert zu“ in der Originaltabelle | DOM | OK, bereits an neue Dienstart-Namen angepasst, durch Test abgedeckt | **behalten** (wird aktiv genutzt, Test vorhanden) |
 
 ### 2.5 Kurssuche – SearchCourse.js (424 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| K1 | „Kursauswahl“ und „Kurssuche“ ausblenden | Standard: beide ausgeblendet, Zustand gespeichert | Storage | OK | |
-| K2 | Autosuche | Beim Aufruf sofort alle Kurse heute bis +12 Monate suchen (Optionen Qualifikationen, Stornos, Anrechnung, E-Learning, Warteliste); abschaltbar in den Einstellungen | DOM, Storage | OK | |
-| K3 | DataTable statt NIU-Tabelle | Volltextsuche, Sortierung inkl. Datum, kein Paging, Link „öffnen“ in neuem Tab | DOM, DataTables | FRAGIL: bricht hart ab, wenn NIU die Spaltenzahl ändert | |
-| K4 | Vorfilter-Leiste | Nur freie Plätze, §50, §50 Reanimation, §51 Rezertifizierung, nur/keine Anrechnungskurse, SAN-Basiskurse, keine SAN-Kurse, FSD, KHD, FKR, Pflichtfortbildungen (RD-Fortbildung) | DataTables | FRAGIL (Kursnamen hart kodiert) | |
-| K5 | Link „anmelden“/„abmelden“ | mailto an Ausbildungs-Postfach je Dienstnummernbereich (west/vs/bvs/ddl/nord/LRK) mit vorausgefülltem Betreff und Text; bei Storno sofort ein `alert` beim Laden | AJAX `Header.aspx` (eigene DNr), PouchDB | FRAGIL (Mailadressen hart kodiert) | |
-| K6 | Kalenderansicht | Nur Kommentar „NOCH VIEL ARBEIT“ | – | TOT | |
+| K1 | „Kursauswahl“ und „Kurssuche“ ausblenden | Standard: beide ausgeblendet, Zustand gespeichert | Storage | OK | **behalten** |
+| K2 | Autosuche | Beim Aufruf sofort alle Kurse heute bis +12 Monate suchen (Optionen Qualifikationen, Stornos, Anrechnung, E-Learning, Warteliste); abschaltbar in den Einstellungen | DOM, Storage | OK | **behalten** |
+| K3 | DataTable statt NIU-Tabelle | Volltextsuche, Sortierung inkl. Datum, kein Paging, Link „öffnen“ in neuem Tab | DOM, DataTables | FRAGIL: bricht hart ab, wenn NIU die Spaltenzahl ändert | **behalten** |
+| K4 | Vorfilter-Leiste | Nur freie Plätze, §50, §50 Reanimation, §51 Rezertifizierung, nur/keine Anrechnungskurse, SAN-Basiskurse, keine SAN-Kurse, FSD, KHD, FKR, Pflichtfortbildungen (RD-Fortbildung) | DataTables | FRAGIL (Kursnamen hart kodiert) | **behalten** |
+| K5 | Link „anmelden“/„abmelden“ | mailto an Ausbildungs-Postfach je Dienstnummernbereich (west/vs/bvs/ddl/nord/LRK) mit vorausgefülltem Betreff und Text; bei Storno sofort ein `alert` beim Laden | AJAX `Header.aspx` (eigene DNr), PouchDB | FRAGIL (Mailadressen hart kodiert) | **behalten** (Mailadressen der Ausbildungen prüfen) |
+| K6 | Kalenderansicht | Nur Kommentar „NOCH VIEL ARBEIT“ | – | TOT | **weg** (tot) |
 
 ### 2.6 Kursdetails – CourseDetail.js (188 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| C1 | Letzte Kostenstelle merken | Select wird auf zuletzt gewählte Kostenstelle gesetzt | Storage `letzte_kostenstelle` | OK | |
-| C2 | Kürzel automatisch in „Bemerkung“ | Aus Einstellung „Kürzel“ | Storage | OK | |
-| C3 | Mitarbeiter-Autocomplete | Ersetzt das Mitarbeiter-Select durch ein Suchfeld (Name oder Dienstnummer) | DOM, jQuery UI | FRAGIL (Auswahl über Teilstring) | |
-| C4 | Kalender-Export | Unter der Überschrift (bei einem Termin) und je Termin in der Termintabelle | DOM, ouical | OK | |
+| C1 | Letzte Kostenstelle merken | Select wird auf zuletzt gewählte Kostenstelle gesetzt | Storage `letzte_kostenstelle` | OK | **behalten** |
+| C2 | Kürzel automatisch in „Bemerkung“ | Aus Einstellung „Kürzel“ | Storage | OK | **behalten** |
+| C3 | Mitarbeiter-Autocomplete | Ersetzt das Mitarbeiter-Select durch ein Suchfeld (Name oder Dienstnummer) | DOM, jQuery UI | FRAGIL (Auswahl über Teilstring) | **behalten** |
+| C4 | Kalender-Export | Unter der Überschrift (bei einem Termin) und je Termin in der Termintabelle | DOM, ouical | OK | **behalten** |
 
 ### 2.7 Offene Ambulanz-Positionen – AmbulancesOpenPositions.js (292 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| A1 | Checkboxen je gesuchter Position | Nur Ambulanzen zeigen, die eine der gewählten Positionen suchen | DOM | OK | |
-| A2 | Wochentags-Checkboxen | Wochentag wird berechnet und vor die Zeit geschrieben | DOM | OK | |
-| A3 | Zeitraumfilter Einsatzbeginn | Alle oder zwischen zwei Daten, Standard heute bis +1 Monat | DOM | OK | |
-| A4 | Layout | Untertabellen 100 %, Links in neuem Tab | – | OK | |
+| A1 | Checkboxen je gesuchter Position | Nur Ambulanzen zeigen, die eine der gewählten Positionen suchen | DOM | OK | **weg** (Ambulanzen in anderem System) |
+| A2 | Wochentags-Checkboxen | Wochentag wird berechnet und vor die Zeit geschrieben | DOM | OK | **weg** |
+| A3 | Zeitraumfilter Einsatzbeginn | Alle oder zwischen zwei Daten, Standard heute bis +1 Monat | DOM | OK | **weg** |
+| A4 | Layout | Untertabellen 100 %, Links in neuem Tab | – | OK | **weg** |
 
 ### 2.8 Ambulanz Detail/Bearbeiten – AmbulancesEdit.js (323 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| E1 | Kalender-Export der Ambulanz | ouical unter der Überschrift | DOM | OK | |
-| E2 | „Email an Alle“ | Lädt je eingeteiltem Mitarbeiter `shortemployee.aspx`, sammelt alle Mailadressen, öffnet mailto mit BCC | AJAX ×N | OK, ohne Fehlerbehandlung (Spinner bleibt bei Fehler stehen) | |
-| E3 | Mail-Icon je Mitarbeiter | mailto mit „Hallo Vorname,“ | AJAX | OK | |
-| E4 | WhatsApp-Icon je Mitarbeiter | Öffnet `api.whatsapp.com/send?phone=` mit Standard-Handynummer | AJAX | OK | |
-| E5 | Excel-Export | Modal mit Auswahl (Einsatzverwendung, SAN, SanG, Fahrer RD, Handy, Email), lädt je Mitarbeiter Berechtigungen und Kontakte, erzeugt XLSX | AJAX ×N, SheetJS | FRAGIL: Datumsformat nur richtig, wenn alle Häkchen gesetzt; keine Häkchen = nichts passiert | |
+| E1 | Kalender-Export der Ambulanz | ouical unter der Überschrift | DOM | OK | **weg** (Ambulanzen in anderem System) |
+| E2 | „Email an Alle“ | Lädt je eingeteiltem Mitarbeiter `shortemployee.aspx`, sammelt alle Mailadressen, öffnet mailto mit BCC | AJAX ×N | OK, ohne Fehlerbehandlung (Spinner bleibt bei Fehler stehen) | **weg** |
+| E3 | Mail-Icon je Mitarbeiter | mailto mit „Hallo Vorname,“ | AJAX | OK | **weg** |
+| E4 | WhatsApp-Icon je Mitarbeiter | Öffnet `api.whatsapp.com/send?phone=` mit Standard-Handynummer | AJAX | OK | **weg** |
+| E5 | Excel-Export | Modal mit Auswahl (Einsatzverwendung, SAN, SanG, Fahrer RD, Handy, Email), lädt je Mitarbeiter Berechtigungen und Kontakte, erzeugt XLSX | AJAX ×N, SheetJS | FRAGIL: Datumsformat nur richtig, wenn alle Häkchen gesetzt; keine Häkchen = nichts passiert | **weg** |
 
 ### 2.9 Mitarbeiterseiten kurz/Zusammenfassung – shortemployee.js, summaryemployee.js
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| V1 | VCF-Download (shortemployee) | vCard mit Foto, Kontakten, Berechtigungen | DOM + Foto per XHR | OK | |
-| V2 | VCF-Download (summaryemployee) | Zusätzlich Dienstnummern, Organigramm, Titel | DOM + Foto per XHR | OK | |
-| V3 | Foto-Download | Foto ist als Download-Link umhüllt | DOM | OK | |
+| V1 | VCF-Download (shortemployee) | vCard mit Foto, Kontakten, Berechtigungen | DOM + Foto per XHR | OK | **behalten** |
+| V2 | VCF-Download (summaryemployee) | Zusätzlich Dienstnummern, Organigramm, Titel | DOM + Foto per XHR | OK | **behalten** |
+| V3 | Foto-Download | Foto ist als Download-Link umhüllt | DOM | OK | **behalten** |
 
 ### 2.10 Mitarbeiter Detail – detailEmployee.js (180 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| M1 | Hinweis „Dekrete noch nicht ausgefolgt“ | PNotify-Popup beim Laden, abschaltbar in den Einstellungen | DOM | FRAGIL (DOM-Pfad `parent()` ×4) | |
-| M2 | Adress-Kopierbox | Textarea mit Name/Titel/Anschrift plus Kopierbutton | DOM, ClipboardJS | OK | |
-| M3 | Brief aus Word-Vorlage | Nutzer wählt lokale .docx-Vorlage, Platzhalter ({anrede}, {name}, {anschrift}, {konto_iban}, {admin_kuerzel} …, siehe template_help.html) werden aus der Seite gefüllt, Download `JJJJMMTT_DNR_Nachname_Vorname_Vorlage.docx` | DOM, Storage (Kürzel), AJAX `Header.aspx`, docxtemplater | OK, alte docxtemplater-API; Bearbeiterdaten werden asynchron geladen | |
+| M1 | Hinweis „Dekrete noch nicht ausgefolgt“ | PNotify-Popup beim Laden, abschaltbar in den Einstellungen | DOM | FRAGIL (DOM-Pfad `parent()` ×4) | **behalten** |
+| M2 | Adress-Kopierbox | Textarea mit Name/Titel/Anschrift plus Kopierbutton | DOM, ClipboardJS | OK | **behalten** |
+| M3 | Brief aus Word-Vorlage | Nutzer wählt lokale .docx-Vorlage, Platzhalter ({anrede}, {name}, {anschrift}, {konto_iban}, {admin_kuerzel} …, siehe template_help.html) werden aus der Seite gefüllt, Download `JJJJMMTT_DNR_Nachname_Vorname_Vorlage.docx` | DOM, Storage (Kürzel), AJAX `Header.aspx`, docxtemplater | OK, alte docxtemplater-API; Bearbeiterdaten werden asynchron geladen | **behalten** |
 
 ### 2.11 Mitarbeiter Liste/Ausdruck – EmployeeDump.js (803 Zeilen, größtes Modul)
 
@@ -157,80 +158,80 @@ Buttons neben der Überschrift:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| P1 | Alle Zeilen selektieren / Selektion löschen | Zeilenauswahl | DOM | OK | |
-| P2 | Mailto an alle sichtbaren / an alle selektierten | mailto mit BCC (Empfänger `test@example.com`, TODO im Code) | DOM, Spalte 5 fest | FRAGIL | |
-| P3 | Memo für alle selektierten | Dialog (Verfasser, Text, Datum, Erinnerung), schreibt je Person ein Memo | POST `df/memo/memo_Neu.asp` | OK, einzige **schreibende** Funktion des ganzen Tools | |
+| P1 | Alle Zeilen selektieren / Selektion löschen | Zeilenauswahl | DOM | OK | **behalten** |
+| P2 | Mailto an alle sichtbaren / an alle selektierten | mailto mit BCC (Empfänger `test@example.com`, TODO im Code) | DOM, Spalte 5 fest | FRAGIL | **behalten** (Platzhalter-Adresse ersetzen) |
+| P3 | Memo für alle selektierten | Dialog (Verfasser, Text, Datum, Erinnerung), schreibt je Person ein Memo | POST `df/memo/memo_Neu.asp` | OK, einzige **schreibende** Funktion des ganzen Tools | **behalten** |
 
 Menü „Funktionen“ → Statistik:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| P4 | Dienststatistik der letzten 6 Monate (16 Untereinträge: AMB_ALL, NFR1, SAN1, SUM_RD, SUM_SAN …) | Je 2 Spalten Stunden und Dienste | `ControlCenterHead` + `EmployeeDutyStatistic` Postback | FRAGIL: Parser kennt nur alte Dienstarten `KTW `, RKS, RKL, RKP; neue Namen wie „RD RTW Mittel ND“ werden vermutlich nicht gezählt | |
-| P5 | RD Dienste der letzten 6 Monate | Spalte plus Mail-Icon „Mitarbeiterdurchsicht“ (Text: Mindestdienstleistung ca. 24 Dienste/Jahr) und Memo-Link | wie P4 | FRAGIL wie P4 | |
-| P6 | Dienststunden SAN der letzten 6 Monate | Zeigt tatsächlich SUM_RD, nicht SUM_SAN | wie P4 | KAPUTT (falscher Schlüssel) | |
-| P7 | Datum letzte Dienstleistung | Letzter Dienst in 12 Monaten, Mail-Icon, Memo-Link | `EmployeeDutyStatistic` Postback | OK | |
+| P4 | Dienststatistik der letzten 6 Monate (16 Untereinträge: AMB_ALL, NFR1, SAN1, SUM_RD, SUM_SAN …) | Je 2 Spalten Stunden und Dienste | `ControlCenterHead` + `EmployeeDutyStatistic` Postback | FRAGIL: Parser kennt nur alte Dienstarten `KTW `, RKS, RKL, RKP; neue Namen wie „RD RTW Mittel ND“ werden vermutlich nicht gezählt | **weg** (Dienstdaten nicht mehr in NIU, Parser kennt nur alte Dienstarten) |
+| P5 | RD Dienste der letzten 6 Monate | Spalte plus Mail-Icon „Mitarbeiterdurchsicht“ (Text: Mindestdienstleistung ca. 24 Dienste/Jahr) und Memo-Link | wie P4 | FRAGIL wie P4 | **weg** |
+| P6 | Dienststunden SAN der letzten 6 Monate | Zeigt tatsächlich SUM_RD, nicht SUM_SAN | wie P4 | KAPUTT (falscher Schlüssel) | **weg** |
+| P7 | Datum letzte Dienstleistung | Letzter Dienst in 12 Monaten, Mail-Icon, Memo-Link | `EmployeeDutyStatistic` Postback | OK | **weg** |
 
 Menü → Ausbildungen:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| P8 | Grundkurse prüfen | Das RK, KHD-SD-Praxis, SAN1-Seminar, Ambulanzseminar: besucht ja/nein | `SearchCourse.aspx?EmployeeId` Postback | FRAGIL (Kursnamen hart kodiert, Cache-Version `grk4` manuell) | |
-| P9 | Pflichtfortbildungen prüfen | KÜ (A03241), First Car, TAG-Modul (A04194/A04200/A04477), Hygiene mit Teilnahmestatus | wie P8 | FRAGIL (Kurs-IDs hart kodiert, Cache `pfb7`) | |
-| P10 | SAN-Ampeln prüfen | Ampel-Icons aus detailEmployee | `detailEmployee.aspx` | OK (Stylesheet wird je Zeile neu eingefügt) | |
-| P11 | No-Shows auswerten | Kurse mit Status „Nicht erschienen“ seit 1900 | wie P8 | KAPUTT (Text wird URL-kodiert angezeigt) | |
-| P12 | Berechtigungen auswerten: Alle / SAN / FSD / Fahrer | Nicht widerrufene Berechtigungen je Typ; „FSD“ filtert im Code auf „GSD“ | `detailEmployee.aspx` | OK / FSD prüfen | |
+| P8 | Grundkurse prüfen | Das RK, KHD-SD-Praxis, SAN1-Seminar, Ambulanzseminar: besucht ja/nein | `SearchCourse.aspx?EmployeeId` Postback | FRAGIL (Kursnamen hart kodiert, Cache-Version `grk4` manuell) | **behalten** |
+| P9 | Pflichtfortbildungen prüfen | KÜ (A03241), First Car, TAG-Modul (A04194/A04200/A04477), Hygiene mit Teilnahmestatus | wie P8 | FRAGIL (Kurs-IDs hart kodiert, Cache `pfb7`) | **behalten** (Kurs-IDs aktuell halten) |
+| P10 | SAN-Ampeln prüfen | Ampel-Icons aus detailEmployee | `detailEmployee.aspx` | OK (Stylesheet wird je Zeile neu eingefügt) | **behalten** |
+| P11 | No-Shows auswerten | Kurse mit Status „Nicht erschienen“ seit 1900 | wie P8 | KAPUTT (Text wird URL-kodiert angezeigt) | **weg** (kaputt; bei Bedarf neu bauen) |
+| P12 | Berechtigungen auswerten: Alle / SAN / FSD / Fahrer | Nicht widerrufene Berechtigungen je Typ; „FSD“ filtert im Code auf „GSD“ | `detailEmployee.aspx` | OK / FSD prüfen | **behalten** |
 
 Menü → Verwaltung / EDV:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| P13 | Dienstgrade auswerten | Spalte Dienstgrad | `detailEmployee.aspx` | OK | |
-| P14 | Gaststatus auswerten | ja/nein | `detailEmployee.aspx` | OK | |
-| P15 | Fehlende MA-Fotos auswerten | Foto-URL enthält „unknown“ | `detailEmployee.aspx` | OK | |
-| P16 | Kommando einblenden | 11 Deep-Links je Person (Details, Urlaub, Fahrscheingeld, Uniform, Schlüssel, Memo, Ausbildung, LV-Statistik, Statistik, Dokumente) | `ControlCenterHead` (nur IDs) | OK, Linkliste dreifach dupliziert (auch memo_last, memo_erinnerung) | |
-| P17 | Ausgegebene/Eingezogene Schlüssel | Tabelle aus `IssuedKeys.aspx`, Klassifizierung per Textheuristik (BegehCard, WEZ, CHS, Transponder, Spind) | `IssuedKeys.aspx` | FRAGIL (feste Substring-Offsets) | |
-| P18 | AD Benutzer auswerten | Zelle mit „Wrk.at“ | `detailEmployee.aspx` | OK | |
-| P19 | „Die nächste freie Dienstnummer lautet …“ | Läuft automatisch, liest Zeichen 15–18 des Suchparameter-Texts, nur richtig wenn nach DNr sortiert | DOM | FRAGIL, redundant zu N1 | |
+| P13 | Dienstgrade auswerten | Spalte Dienstgrad | `detailEmployee.aspx` | OK | **behalten** |
+| P14 | Gaststatus auswerten | ja/nein | `detailEmployee.aspx` | OK | **behalten** |
+| P15 | Fehlende MA-Fotos auswerten | Foto-URL enthält „unknown“ | `detailEmployee.aspx` | OK | **behalten** |
+| P16 | Kommando einblenden | 11 Deep-Links je Person (Details, Urlaub, Fahrscheingeld, Uniform, Schlüssel, Memo, Ausbildung, LV-Statistik, Statistik, Dokumente) | `ControlCenterHead` (nur IDs) | OK, Linkliste dreifach dupliziert (auch memo_last, memo_erinnerung) | **behalten** |
+| P17 | Ausgegebene/Eingezogene Schlüssel | Tabelle aus `IssuedKeys.aspx`, Klassifizierung per Textheuristik (BegehCard, WEZ, CHS, Transponder, Spind) | `IssuedKeys.aspx` | FRAGIL (feste Substring-Offsets) | **behalten** |
+| P18 | AD Benutzer auswerten | Zelle mit „Wrk.at“ | `detailEmployee.aspx` | OK | **behalten** |
+| P19 | „Die nächste freie Dienstnummer lautet …“ | Läuft automatisch, liest Zeichen 15–18 des Suchparameter-Texts, nur richtig wenn nach DNr sortiert | DOM | FRAGIL, redundant zu N1 | **weg** (fragil, N1 macht dasselbe) |
 
 ### 2.12 Mitarbeiter Neu – newEmployee.js (42 Zeilen)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| N1 | Alle freien DNr anzeigen | Tabelle freier Nummern im Tausenderbereich um den Durchschnitt aller Nummern im Dropdown | `ControlCenterHead.aspx` | FRAGIL (lexikografische Sortierung, nur ein Nummernbereich) | |
-| N2 | Zufällige freie DNr zuordnen | Trägt eine freie Nummer ins Feld ein | wie N1 | FRAGIL wie N1 | |
+| N1 | Alle freien DNr anzeigen | Tabelle freier Nummern im Tausenderbereich um den Durchschnitt aller Nummern im Dropdown | `ControlCenterHead.aspx` | FRAGIL (lexikografische Sortierung, nur ein Nummernbereich) | **behalten** |
+| N2 | Zufällige freie DNr zuordnen | Trägt eine freie Nummer ins Feld ein | wie N1 | FRAGIL wie N1 | **behalten** |
 
 ### 2.13 Memos – memo_last.js (79), memo_erinnerung.js (50)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| ML1 | Autor-Filter (nur memo_last) | Dropdown, blendet Memo-Tabellen anderer Autoren aus | DOM | FRAGIL (Textsuche über ganze Tabelle) | |
-| ML2 | Mail-Icon je Memo/Erinnerung | DNr aus Überschrift → Mailadresse → mailto | `ControlCenterHead` + `detailEmployee` | OK | |
-| ML3 | Zahnrad je Memo/Erinnerung | Gleiche 11 Kommando-Links wie P16 | `ControlCenterHead` | OK | |
+| ML1 | Autor-Filter (nur memo_last) | Dropdown, blendet Memo-Tabellen anderer Autoren aus | DOM | FRAGIL (Textsuche über ganze Tabelle) | **behalten** |
+| ML2 | Mail-Icon je Memo/Erinnerung | DNr aus Überschrift → Mailadresse → mailto | `ControlCenterHead` + `detailEmployee` | OK | **behalten** |
+| ML3 | Zahnrad je Memo/Erinnerung | Gleiche 11 Kommando-Links wie P16 | `ControlCenterHead` | OK | **behalten** |
 
 ### 2.14 Spezialdienste
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| SP1 | Spezialdienst-Eingabe vorbefüllen | Datum heute, Endzeit jetzt, Kennziffer „Admin_BS_Funkt“, Listeneingabe angehakt | DOM | OK, Kennziffer hart kodiert | |
-| SP2 | Unterschreiben: Button „OK“ im Tabellenkopf | Hakt alle OK-Checkboxen an | DOM | OK; `spezialdienstUnterschreiben.html` (Menü „alle genehmigen/ablehnen“) wird nie geladen | |
+| SP1 | Spezialdienst-Eingabe vorbefüllen | Datum heute, Endzeit jetzt, Kennziffer „Admin_BS_Funkt“, Listeneingabe angehakt | DOM | OK, Kennziffer hart kodiert | **prüfen** (läuft Spezialdiensterfassung noch in NIU?) |
+| SP2 | Unterschreiben: Button „OK“ im Tabellenkopf | Hakt alle OK-Checkboxen an | DOM | OK; `spezialdienstUnterschreiben.html` (Menü „alle genehmigen/ablehnen“) wird nie geladen | **prüfen** (wie SP1) |
 
 ### 2.15 Kopfzeile, Einstellungen, Dropdown
 
 | # | Funktion | Was es tut | Zustand | Entscheidung |
 |---|---|---|---|---|
-| H1 | Hinweis „NIU's little helper ist derzeit aktiv“ mit Link zum Readme | Header.js | OK | |
-| H2 | Link „⚙ Einstellungen“ (Userscript) | header-extras.js | OK | |
-| H3 | Einstellungsseite unter `Header.aspx#niu-helper-settings` (Userscript) | Kürzel, Autosuche, Cache, Autocomplete, Dekret-Hinweis | OK | |
-| H4 | Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown (Userscript) | Filtert Dropdown auf Dienstnummern 8000–8999, Zustand in localStorage, überlebt Postbacks | OK, Test vorhanden | |
-| H5 | ControlCenter.js | Leer, Autocomplete-Aufruf auskommentiert | TOT | |
-| H6 | background.js (nur Extension) | Willkommensseite bei Install/Update, Dev-Reload | entfällt im Userscript | |
+| H1 | Hinweis „NIU's little helper ist derzeit aktiv“ mit Link zum Readme | Header.js | OK | **behalten** |
+| H2 | Link „⚙ Einstellungen“ (Userscript) | header-extras.js | OK | **behalten** |
+| H3 | Einstellungsseite unter `Header.aspx#niu-helper-settings` (Userscript) | Kürzel, Autosuche, Cache, Autocomplete, Dekret-Hinweis | OK | **behalten** |
+| H4 | Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown (Userscript) | Filtert Dropdown auf Dienstnummern 8000–8999, Zustand in localStorage, überlebt Postbacks | OK, Test vorhanden | **behalten** |
+| H5 | ControlCenter.js | Leer, Autocomplete-Aufruf auskommentiert | TOT | **weg** (leer) |
+| H6 | background.js (nur Extension) | Willkommensseite bei Install/Update, Dev-Reload | entfällt im Userscript | **weg** (nur Extension) |
 
 ### 2.16 Intranet (Confluence)
 
 | # | Funktion | Was es tut | Zustand | Entscheidung |
 |---|---|---|---|---|
-| I1 | Bescheiderstellung: Word-Vorlage füllen | Liest Feldnamen aus `#i_fieldnames`, `#i_filename`, `#i_dropdowns` der Confluence-Seite, füllt hochgeladene .docx, Download | OK, nur wenn die Confluence-Seite diese Felder noch hat | |
-| I2 | Fahrzeugtagebuch: Status-Filter und Farbcodierung | Checkboxen je Status im Tabellenkopf, Priorität farbig, nicht gewählte Listeneinträge ausgeblendet; Kategorie-/Prioritätsfilter auskommentiert | OK / teilweise TOT | |
+| I1 | Bescheiderstellung: Word-Vorlage füllen | Liest Feldnamen aus `#i_fieldnames`, `#i_filename`, `#i_dropdowns` der Confluence-Seite, füllt hochgeladene .docx, Download | OK, nur wenn die Confluence-Seite diese Felder noch hat | **prüfen** (Confluence, unabhängig von NIU; behalten, falls die Seite noch genutzt wird) |
+| I2 | Fahrzeugtagebuch: Status-Filter und Farbcodierung | Checkboxen je Status im Tabellenkopf, Priorität farbig, nicht gewählte Listeneinträge ausgeblendet; Kategorie-/Prioritätsfilter auskommentiert | OK / teilweise TOT | **prüfen** (wie I1) |
 
 ---
 
@@ -346,3 +347,60 @@ Alle Postback-Parser hängen an WebForms-Feldnamen (`ctl00$main$…`, Options-In
 - Manifest V2 mit `chrome.extension.getURL`, `webRequestBlocking`; in Chrome nicht mehr installierbar, im Userscript durch den Shim abgefangen.
 - Durchgehend implizite globale Variablen, fehlende Fehlerbehandlung bei AJAX, viele `console.log`.
 - Sensibel: M3 übernimmt IBAN/BIC in die Word-Vorlage; P3 schreibt Memos für viele Personen auf einmal.
+
+---
+
+## 8. Vorschlag zur Vorsortierung (2026-09-21)
+
+Ausgangslage laut Besitzer: Dienstplanung (Dienstplan **und** Ambulanzen) läuft
+in einem anderen System. Kurse und Kurssuche bleiben in NIU. Die
+Mitarbeiter-Erfassung bleibt in NIU.
+
+### Weg (Vorschlag)
+
+| Modul | Begründung |
+|---|---|
+| DutyRoster.js (D1–D15) | Dienstplan ist nicht mehr in NIU |
+| AmbulancesOpenPositions.js (A1–A4), AmbulancesEdit.js (E1–E5) | Ambulanzen sind nicht mehr in NIU |
+| today.js (T1–T3, T6, T7) | Kalender-Export und ICS betreffen Dienste und Ambulanzen; T4/T5 siehe „prüfen“ |
+| EmployeeDutyStatistic.js (S1–S7) | Statistik der alten Dienstplandaten; nur behalten, wenn Alt-Daten noch angesehen werden |
+| EmployeeDump P4–P7 | Dienststatistik-Spalten; Parser kennt ohnehin nur alte Dienstart-Namen |
+| EmployeeDump P11, P19 | kaputt bzw. redundant zu newEmployee N1 |
+| Toter Code | K6, H5, H6, `dienststellenKuerzel`, `docImage`, `spezialdienstUnterschreiben.html`, Duplikate aus Abschnitt 7 |
+| Einstellung „Autocomplete-Felder im Dienstplan“ | hängt nur an D13 |
+
+### Behalten (Vorschlag)
+
+| Modul | Begründung |
+|---|---|
+| SearchCourse.js (K1–K5), CourseDetail.js (C1–C4) | Kurse und Kurssuche bleiben in NIU |
+| LVStatistic.js (L1) | wird aktiv genutzt, im September 2026 angepasst, Test vorhanden |
+| EmployeeDump ohne Dienststatistik (P1–P3, P8–P10, P12–P18) | Mitarbeiter-Verwaltung: Ausbildungen, Berechtigungen, Schlüssel, Stammdaten, Sammel-Mail/-Memo |
+| newEmployee.js (N1, N2), detailEmployee.js (M1–M3) | Mitarbeiter-Erfassung |
+| shortemployee.js, summaryemployee.js (V1–V3) | VCF-Download der Mitarbeiterseiten |
+| memo_last.js, memo_erinnerung.js (ML1–ML3) | Memos gehören zur Mitarbeiter-Verwaltung |
+| Header.js, header-extras.js, settings.js, nur8xxx.js (H1–H4) | Grundgerüst des Userscripts |
+
+### Prüfen
+
+| ID | Frage |
+|---|---|
+| T4, T5 | Zeigt die Startseite noch die Kurstabelle? Dann Kalender-Export je Kurs behalten, sonst today.js komplett weg. |
+| SP1, SP2 | Läuft die Spezialdiensterfassung (`/df/…`, `/TNG/…`) noch in NIU oder ist sie mit der Dienstplanung umgezogen? |
+| I1, I2 | Werden die Confluence-Seiten Bescheiderstellung und Fahrzeugtagebuch noch genutzt? Unabhängig von NIU. |
+| K5 | Stimmen die Ausbildungs-Postfächer je Dienstnummernbereich noch? |
+
+### Folgen für Bibliotheken und gemeinsamen Code, wenn „weg“ so umgesetzt wird
+
+Entfallen komplett: **ics.js**, **SheetJS** (ca. 1 MB), **spin.js**, **Chartist**.
+Bleiben: jQuery, jQuery UI (CourseDetail C3, EmployeeDump-Menü), PouchDB, DataTables (SearchCourse, EmployeeDump),
+moment (SearchCourse), ouical (CourseDetail C4, ggf. T4), jquery-modal, vex, PNotify, ClipboardJS,
+docxtemplater/JSZip/FileSaver.
+
+staff-lib.js: `calculateDutyStatistic`, `DutyCount`, `DUTY_TYPES`, `getLastDuty`, `expDFActive`,
+`getOperableDNRs`, `convertDFField` entfallen; die Zahl der `niu.wrk.at`-URLs sinkt, Zähler in `build.py` anpassen.
+lib.js: `getDuties`, `getHeaderNumber`, `getEmployeeDataFromLink`, `getDefaultPhone`, `getDefaultEmail`,
+`getAllEmails`, `parseHTMLOnly`, `createCalElement` entfallen; `getDurationFromTimeString` nur noch, falls S1 bleibt.
+var.js: `department`, `dienstTypen`, `mailImage`, `whatsappImage`, `xlsxImage` entfallen (falls T2–T4 weg).
+manifest.json: die Einträge DutyRoster, Ambulances*, EmployeeDutyStatistic, Today (falls komplett weg) und
+ControlCenterHead streichen; überflüssige Lib-Ladungen aus Abschnitt 4 bereinigen.
