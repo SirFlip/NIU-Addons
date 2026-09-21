@@ -27597,7 +27597,10 @@ $(document).ready(function() {
        return dnrToIdentifier(dnr)
         .then(function(result) { return checkCourseAttendance(result.EID, grundkurse); })
         .then(function(resultDict) {
-          return ("Das RK: " + resultDict.kurs1.tnStatus + "<br />KHD-SD: " + resultDict.kurs3.tnStatus + "<br />SAN1-Seminar: " + resultDict.kurs4.tnStatus + "<br />AmbSem (alt): " + resultDict.kurs2.tnStatus);
+          // das alte Ambulanzseminar gilt als SAN1-Seminar
+          var san1 = resultDict.kurs4.tnStatus;
+          if (san1 === "nein" && resultDict.kurs2.tnStatus !== "nein") { san1 = resultDict.kurs2.tnStatus; }
+          return ("Das RK: " + resultDict.kurs1.tnStatus + "<br />KHD-SD: " + resultDict.kurs3.tnStatus + "<br />SAN1-Seminar: " + san1);
         });
     });
 
