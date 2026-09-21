@@ -147,8 +147,7 @@ Legende
 |---|---|---|---|---|---|
 | M1 | Hinweis „Dekrete noch nicht ausgefolgt“ | PNotify-Popup beim Laden, abschaltbar in den Einstellungen | DOM | FRAGIL (DOM-Pfad `parent()` ×4) | **behalten** |
 | M2 | Adress-Kopierbox | Textarea mit Name/Titel/Anschrift plus Kopierbutton | DOM, ClipboardJS | OK | **behalten** |
-| M3 | Brief aus Word-Vorlage | Nutzer wählt lokale .docx-Vorlage, Platzhalter ({anrede}, {name}, {anschrift}, {konto_iban}, {admin_kuerzel} …, siehe template_help.html) werden aus der Seite gefüllt, Download `JJJJMMTT_DNR_Nachname_Vorname_Vorlage.docx` | DOM, Storage (Kürzel), AJAX `Header.aspx`, docxtemplater | OK, alte docxtemplater-API; Bearbeiterdaten werden asynchron geladen | **behalten** |
-
+| M3 | Brief aus Word-Vorlage | Nutzer wählt lokale .docx-Vorlage, Platzhalter ({anrede}, {name}, {anschrift}, {konto_iban}, {admin_kuerzel} …, siehe template_help.html) werden aus der Seite gefüllt, Download `JJJJMMTT_DNR_Nachname_Vorname_Vorlage.docx` | DOM, Storage (Kürzel), AJAX `Header.aspx`, docxtemplater | OK, alte docxtemplater-API; Bearbeiterdaten werden asynchron geladen | **weg** (Brief von Hand ist kaum Arbeit) |
 ### 2.11 Mitarbeiter Liste/Ausdruck – EmployeeDump.js (803 Zeilen, größtes Modul)
 
 Grundfunktion: NIU-Tabelle wird durch eine DataTable ersetzt (Sortierung, Filterfeld je Spalte, Durchschnitt in der Fußzeile, Zeilen per Klick auswählbar). Jeder Menüpunkt hängt eine Spalte an und fragt **je Zeile** NIU ab (alle parallel, bei 100 Mitarbeitern 200 bis 400 Requests). Ergebnisse 24 h im PouchDB-Cache.
@@ -175,11 +174,10 @@ Menü → Ausbildungen:
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
 | P8 | Grundkurse prüfen | Das RK, KHD-SD-Praxis, SAN1-Seminar, Ambulanzseminar: besucht ja/nein | `SearchCourse.aspx?EmployeeId` Postback | FRAGIL (Kursnamen hart kodiert, Cache-Version `grk4` manuell) | **behalten** |
-| P9 | Pflichtfortbildungen prüfen | KÜ (A03241), First Car, TAG-Modul (A04194/A04200/A04477), Hygiene mit Teilnahmestatus | wie P8 | FRAGIL (Kurs-IDs hart kodiert, Cache `pfb7`) | **behalten** (Kurs-IDs aktuell halten) |
+| P9 | Pflichtfortbildungen prüfen | KÜ (A03241), First Car, TAG-Modul (A04194/A04200/A04477), Hygiene mit Teilnahmestatus | wie P8 | FRAGIL (Kurs-IDs hart kodiert, Cache `pfb7`) | **weg** |
 | P10 | SAN-Ampeln prüfen | Ampel-Icons aus detailEmployee | `detailEmployee.aspx` | OK (Stylesheet wird je Zeile neu eingefügt) | **behalten** |
 | P11 | No-Shows auswerten | Kurse mit Status „Nicht erschienen“ seit 1900 | wie P8 | KAPUTT (Text wird URL-kodiert angezeigt) | **weg** (kaputt; bei Bedarf neu bauen) |
-| P12 | Berechtigungen auswerten: Alle / SAN / FSD / Fahrer | Nicht widerrufene Berechtigungen je Typ; „FSD“ filtert im Code auf „GSD“ | `detailEmployee.aspx` | OK / FSD prüfen | **behalten** |
-
+| P12 | Berechtigungen auswerten: Alle / SAN / FSD / Fahrer | Nicht widerrufene Berechtigungen je Typ; „FSD“ filtert im Code auf „GSD“ | `detailEmployee.aspx` | OK / FSD prüfen | **behalten** (To-do: Fahrer-Berechtigung ist auf drei Berechtigungen aufgeteilt, Filter anpassen) |
 Menü → Verwaltung / EDV:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
@@ -196,9 +194,8 @@ Menü → Verwaltung / EDV:
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
 |---|---|---|---|---|---|
-| N1 | Alle freien DNr anzeigen | Tabelle freier Nummern im Tausenderbereich um den Durchschnitt aller Nummern im Dropdown | `ControlCenterHead.aspx` | FRAGIL (lexikografische Sortierung, nur ein Nummernbereich) | **behalten** |
-| N2 | Zufällige freie DNr zuordnen | Trägt eine freie Nummer ins Feld ein | wie N1 | FRAGIL wie N1 | **behalten** |
-
+| N1 | Alle freien DNr anzeigen | Tabelle freier Nummern im Tausenderbereich um den Durchschnitt aller Nummern im Dropdown | `ControlCenterHead.aspx` | FRAGIL (lexikografische Sortierung, nur ein Nummernbereich) | **weg** |
+| N2 | Zufällige freie DNr zuordnen | Trägt eine freie Nummer ins Feld ein | wie N1 | FRAGIL wie N1 | **weg** |
 ### 2.13 Memos – memo_last.js (79), memo_erinnerung.js (50)
 
 | # | Funktion | Was es tut | Datenquelle | Zustand | Entscheidung |
@@ -217,7 +214,7 @@ Menü → Verwaltung / EDV:
 
 | # | Funktion | Was es tut | Zustand | Entscheidung |
 |---|---|---|---|---|
-| H1 | Hinweis „NIU's little helper ist derzeit aktiv“ mit Link zum Readme | Header.js | OK | **behalten** |
+| H1 | Hinweis „NIU's little helper ist derzeit aktiv“ mit Link zum Readme | Header.js | OK | **behalten** (Text auf „NIU-Addon“ ändern) |
 | H2 | Link „⚙ Einstellungen“ (Userscript) | header-extras.js | OK | **behalten** |
 | H3 | Einstellungsseite unter `Header.aspx#niu-helper-settings` (Userscript) | Kürzel, Autosuche, Cache, Autocomplete, Dekret-Hinweis | OK | **behalten** |
 | H4 | Häkchen „nur 8xxx“ am Mitarbeiter-Dropdown (Userscript) | Filtert Dropdown auf Dienstnummern 8000–8999, Zustand in localStorage, überlebt Postbacks | OK, Test vorhanden | **behalten** |
@@ -366,7 +363,9 @@ mehr gebraucht.
 | EmployeeDutyStatistic.js (S1–S7) komplett | Statistik der alten Dienstplandaten |
 | SearchCourse.js: K5, K6 | Anmelde-/Abmelde-Mail nicht mehr nötig (Self-Service); K6 tot |
 | CourseDetail.js: C1, C2, C3 | Kostenstelle, Kürzel und Mitarbeiter-Autocomplete gehören zum Anmeldeformular |
-| EmployeeDump.js: P4–P7, P11, P19 | Dienststatistik-Spalten (Dienstdaten nicht mehr in NIU), No-Shows kaputt, freie DNr redundant zu N1 |
+| EmployeeDump.js: P4–P7, P9, P11, P19 | Dienststatistik-Spalten (Dienstdaten nicht mehr in NIU), Pflichtfortbildungen, No-Shows kaputt, freie DNr |
+| detailEmployee.js: M3 | Brief aus Word-Vorlage; von Hand kaum Arbeit |
+| newEmployee.js (N1, N2) komplett | freie Dienstnummern nicht mehr nötig |
 | vfm-bescheiderstellung.js (I1), viewpage.action.js (I2) komplett | Confluence-Erweiterungen nicht mehr gebraucht |
 | ControlCenter.js (H5), background.js (H6) | leer bzw. nur Extension |
 | Einstellung „Autocomplete-Felder im Dienstplan“ | hängt nur an D13 |
@@ -380,32 +379,38 @@ mehr gebraucht.
 | SearchCourse.js: K1–K4 | Kurssuche mit Autosuche, Tabelle und Vorfiltern |
 | CourseDetail.js: C4 | Kalender-Export je Kurstermin |
 | LVStatistic.js (L1) | wird aktiv genutzt, im September 2026 angepasst, Test vorhanden |
-| EmployeeDump.js: P1–P3, P8–P10, P12–P18 | Mitarbeiter-Verwaltung: Ausbildungen, Berechtigungen, Schlüssel, Stammdaten, Sammel-Mail/-Memo |
-| newEmployee.js (N1, N2), detailEmployee.js (M1–M3) | Mitarbeiter-Erfassung |
+| EmployeeDump.js: P1–P3, P8, P10, P12–P18 | Mitarbeiter-Verwaltung: Grundkurse, Ampel, Berechtigungen, Schlüssel, Stammdaten, Sammel-Mail/-Memo |
+| detailEmployee.js: M1, M2 | Dekret-Hinweis und Adress-Kopierbox |
 | shortemployee.js, summaryemployee.js (V1–V3) | VCF-Download der Mitarbeiterseiten |
 | memo_last.js, memo_erinnerung.js (ML1–ML3) | Memos gehören zur Mitarbeiter-Verwaltung |
 | Spezialdiensteingabe.js (SP1), spezialdienstUnterschreiben.js (SP2) | Spezialdienste werden weiter in NIU erfasst |
-| Header.js, header-extras.js, settings.js, nur8xxx.js (H1–H4) | Grundgerüst des Userscripts |
+| Header.js, header-extras.js, settings.js, nur8xxx.js (H1–H4) | Grundgerüst des Userscripts; H1-Text wird „NIU-Addon“ |
 
 ### Folgen für Bibliotheken und gemeinsamen Code
 
-Entfallen komplett: **ics.js**, **SheetJS** (ca. 1 MB), **spin.js**, **Chartist**, **jQuery UI** (letzter Nutzer war
-C3; das jQuery-UI-Menü in EmployeeDump/newEmployee muss dann durch ein einfaches Menü ersetzt werden, oder jQuery UI bleibt).
-Bleiben: jQuery, PouchDB, DataTables + datetime-moment, moment (SearchCourse), ouical (T4, C4), jquery-modal (M3),
-vex (EmployeeDump), PNotify (M1), ClipboardJS (M2), docxtemplater/JSZip/JSZip-Utils/FileSaver (M3).
+Entfallen komplett: **ics.js**, **SheetJS** (ca. 1 MB), **spin.js**, **Chartist**, **docxtemplater**, **JSZip**,
+**JSZip-Utils**, **FileSaver**, **jquery-modal** (letzte Nutzer M3 und I1), **jQuery UI** (letzte echte Nutzer C3 und
+newEmployee; das jQuery-UI-Menü in EmployeeDump muss dann durch ein einfaches Menü ersetzt werden, sonst bleibt jQuery UI).
+Bleiben: jQuery, PouchDB, DataTables + datetime-moment, moment (SearchCourse), ouical (T4, C4), vex (EmployeeDump),
+PNotify (M1), ClipboardJS (M2).
 
 staff-lib.js: `calculateDutyStatistic`, `DutyCount`, `DUTY_TYPES`, `getLastDuty`, `expDFActive`, `getOperableDNRs`,
-`convertDFField`, `makeEmployeeSearchField(+Overlay)`, `getEmployeeCourses` (nur P11) entfallen; `getKuerzel` nur noch
-für M3; `getOwnDNRs` nur noch für M3 und P3. Die Zahl der `niu.wrk.at`-URLs sinkt, Zähler in `build.py` anpassen.
+`convertDFField`, `makeEmployeeSearchField(+Overlay)`, `getEmployeeCourses` (nur P11), `getFreeEmployeeDNRs`,
+`getKuerzel`, `getOwnName` entfallen; `getOwnDNRs` nur noch für P3; `checkCourseAttendance` nur noch für P8.
+Die Zahl der `niu.wrk.at`-URLs sinkt, Zähler in `build.py` anpassen.
 lib.js: `getDuties`, `getHeaderNumber`, `getEmployeeDataFromLink`, `getDurationFromTimeString`, `getDefaultPhone`,
 `getDefaultEmail`, `getAllEmails`, `parseHTMLOnly`, `createCalElement` entfallen (T4 hat eine eigene Variante,
 CourseDetail ebenfalls; eine davon nach lib.js ziehen).
-var.js: `dienstTypen`, `mailImage`, `whatsappImage`, `xlsxImage` entfallen; `department` bleibt für T4.
-definitions.js/settings.js: Option „Autocomplete-Felder im Dienstplan“ und die ungenutzten Cache-Zeit-Konstanten entfernen;
-Einstellung „Kürzel“ bleibt für M3.
-manifest.json: Einträge DutyRoster, Ambulances*, EmployeeDutyStatistic, ControlCenterHead und beide Intranet-Einträge
-streichen; `@match`-Zeilen für intranet.wrk.at in build.py entfernen; überflüssige Lib-Ladungen aus Abschnitt 4 bereinigen.
-Tests: smoke.js-Fälle für AmbulancesEdit, EmployeeDutyStatistic und Confluence entfernen bzw. auf „kein Modul startet“ umstellen.
+var.js: `dienstTypen`, `mailImage`, `whatsappImage`, `xlsxImage`, `helpImage`, `dienstgrade` (nur M3 und P13; P13
+liest den Dienstgrad direkt) prüfen; `department` bleibt für T4, `copyImage` für M2.
+definitions.js/settings.js: Optionen „Kürzel“ und „Autocomplete-Felder im Dienstplan“ sowie die ungenutzten
+Cache-Zeit-Konstanten entfernen. Es bleiben: Autosuche Kurssuche, Cache, Dekret-Hinweis.
+webcontent: `template_help.html`, `newemployee_menu.html`, `spezialdienstUnterschreiben.html`, Welcome-Seiten entfallen.
+manifest.json: Einträge DutyRoster, Ambulances*, EmployeeDutyStatistic, newEmployee, ControlCenterHead und beide
+Intranet-Einträge streichen; `@match`-Zeilen für intranet.wrk.at in build.py entfernen; überflüssige Lib-Ladungen
+aus Abschnitt 4 bereinigen.
+Tests: smoke.js-Fälle für AmbulancesEdit, detailEmployee (Vorlagen-Box), EmployeeDutyStatistic, newEmployee und
+Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
 
 ---
 
@@ -414,5 +419,8 @@ Tests: smoke.js-Fälle für AmbulancesEdit, EmployeeDutyStatistic und Confluence
 - **„nur 8xxx“ für andere Nummernkreise:** Das Häkchen am Mitarbeiter-Dropdown filtert fest auf 8000–8999
   (`userscript/nur8xxx.js`, Regex `\(8\d{3}\)`). Gewünscht ist eine Auswahl des Nummernkreises, z. B. über die
   Einstellungsseite (Bereich eintragen oder aus den vorhandenen Tausenderbereichen wählen), Zustand weiterhin merken.
+- **P12 Fahrer-Berechtigung:** Die Berechtigung „Fahrer“ wurde in NIU auf drei einzelne Berechtigungen
+  aufgeteilt. Der Filter in EmployeeDump (`typ` enthält „Fahrer“) und die Spaltenbeschriftung müssen geprüft und
+  ggf. auf die drei neuen Typen umgestellt werden.
 - P2: Platzhalter-Empfänger `test@example.com` durch die richtige Adresse ersetzen oder das Feld leer lassen.
-- P9: Kurs-IDs der Pflichtfortbildungen und die Cache-Versionen `pfb7`/`grk4` beim Ändern hochzählen.
+- P8: Kursnamen der Grundkurse und die Cache-Version `grk4` beim Ändern hochzählen.
