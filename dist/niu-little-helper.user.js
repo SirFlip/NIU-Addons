@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NIU's little helper (Userscript)
 // @namespace    niu.hannes
-// @version      0.59.0.6
+// @version      0.59.0.7
 // @description  NIU-Addon: Userscript-Portierung von NIU's little helper (Wiener Rotes Kreuz, NIU), reduziert auf Kurse, Mitarbeiter-Verwaltung, Memos und Spezialdienste, plus Filter 'nur 8xxx' im Mitarbeiter-Dropdown.
 // @author       Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes
 // @homepageURL  https://github.com/SirFlip/NIU-Addons
@@ -29,7 +29,7 @@
 // Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).
 
 (function () {
-var __VERSION = "0.59.0.6";
+var __VERSION = "0.59.0.7";
 var jQuery, $, moment, PouchDB, createCalendar, PNotify, ClipboardJS, vex;
 var __RES = {
   "img/addCal.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAARCAYAAADQWvz5AAAAAXNSR0IArs4c6QAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAATVJREFUOBGtU0FOwzAQjFPTBNETh4griBtXvlDxA96AxHuQeAM/QP0CUj+A4AeckEjapstM8FrO0iiKwNLWuzPr6XrXyTKzjorijmbgGA7xPmYER7LswmJpPMS7kHTsi+Iewacmwn9TX4VSLPiLXdM8gP+a4acTwV7BtrATGFfq/yB9jHyVe3+1b9t1XpblGYGQqTvD1A90D1O+okauGX/d/02oNzU2cEpl6TCiEEW2TfNohXD/c2J1Xb9bjm9KxUav1orc0KyIjWNFlmAlO5FL/OOCHN7Z0jv3eqiyjrcCGlME/lJj+sAY/roiwcGK8GJX4Ff63R3qHwV0jfZIE8f2WBF7oRMyh54Zz8L0Ug5X7fpHDFNH0nx+65y7pj91ichLu9k8dUI8TLHcudMpQnuRD4rwzDf+tlv83c+fwAAAAABJRU5ErkJggg==",
@@ -27692,11 +27692,12 @@ __SCRIPTS["src/content_scripts/menu.js"] = function () {
 
 // ===== src/content_scripts/Header.js =====
 __SCRIPTS["src/content_scripts/Header.js"] = function () {
-
+// Kopfzeile: Hinweis mit Versionsnummer, verlinkt auf das Repo (Einstellungs-Link kommt aus header-extras.js)
 $(document).ready(function() {
-
-$("#pageTitle").after('<b><a target="_blank" style="color:white;border-bottom: 1px white dotted; text-decoration: none;" href="https://github.com/SirFlip/NIU-Addons#readme">NIU-Addon ist derzeit aktiv.</a></b>');
-
+  var version = '';
+  try { version = chrome.runtime.getManifest().version; } catch (e) { /* ohne Version */ }
+  var text = 'NIU-Addon' + (version ? ' ' + version : '') + ' ist derzeit aktiv.';
+  $("#pageTitle").after('<b><a target="_blank" style="color:white;border-bottom: 1px white dotted; text-decoration: none;" href="https://github.com/SirFlip/NIU-Addons#readme" title="NIU-Addon: Readme auf GitHub">' + text + '</a></b>');
 });
 
 };

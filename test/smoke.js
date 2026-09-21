@@ -8,7 +8,7 @@ const code = fs.readFileSync(__dirname + '/build-test.user.js', 'utf8');
 const cases = [
   { url: 'https://niu.wrk.at/Kripo/Header.aspx', html: '<span id="pageTitle">NIU</span><select id="m_ddlEmployee"><option value="1">Huber (8123)</option><option value="2">Maier (7001)</option></select>',
     expectScripts: ['Header.js', 'header-extras.js', 'nur8xxx.js', 'settings.js'], expectGlobals: ['jQuery'],
-    check: (w) => [!!w.document.querySelector('#niuHelperSettingsLink'), !!w.document.querySelector('#f8000wrap'), /NIU-Addon ist derzeit aktiv/.test(w.document.body.innerHTML)] },
+    check: (w) => [!!w.document.querySelector('#niuHelperSettingsLink'), !!w.document.querySelector('#f8000wrap'), /NIU-Addon \d+\.\d+\.\d+\.\d+ ist derzeit aktiv\./.test(w.document.body.innerHTML)] },
   // Entfernte Module: Dienstplan, Ambulanzen, Dienststatistik, Mitarbeiter Neu, Leitstellen-Kopf
   { url: 'http://niu/kripo/Ambulances/AmbulancesEdit.aspx?id=5', html: '<h1>Ambulanz</h1>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
   { url: 'https://niu.wrk.at/Kripo/DutyRosterNH/DutyRoster.aspx', html: '<table></table>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
