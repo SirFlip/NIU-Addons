@@ -8,40 +8,46 @@ const code = fs.readFileSync(__dirname + '/build-test.user.js', 'utf8');
 const cases = [
   { url: 'https://niu.wrk.at/Kripo/Header.aspx', html: '<span id="pageTitle">NIU</span><select id="m_ddlEmployee"><option value="1">Huber (8123)</option><option value="2">Maier (7001)</option></select>',
     expectScripts: ['Header.js', 'header-extras.js', 'nur8xxx.js', 'settings.js'], expectGlobals: ['jQuery'],
-    check: (w) => [!!w.document.querySelector('#niuHelperSettingsLink'), !!w.document.querySelector('#f8000wrap')] },
-  { url: 'http://niu/kripo/Ambulances/AmbulancesEdit.aspx?id=5', html: '<h1>Ambulanz</h1><h2>Testambulanz</h2><span id="ctl00_main_m_AmbulanceDisplay_m_Number">12/2026</span><span id="ctl00_main_m_AmbulanceDayDisplay_m_SubNumber">1</span>' +
-      '<span id="ctl00_main_m_AmbulanceDayDisplay_m_Start">Mo, 21.9.2026 8:00</span><span id="ctl00_main_m_AmbulanceDayDisplay_m_StartWork">Mo, 21.9.2026 9:00</span><span id="ctl00_main_m_AmbulanceDayDisplay_m_EndWork">Mo, 21.9.2026 18:00</span>' +
-      '<span id="ctl00_main_m_AmbulanceDisplay_m_Ort">Wien</span><table><tr class="DutyRosterHeader"><td>a</td><td>b</td></tr></table>',
-    expectScripts: ['AmbulancesEdit.js', 'nur8xxx.js'], expectGlobals: ['jQuery', 'moment', 'XLSX', 'createCalendar', 'Spinner'],
-    check: (w) => [/calendar\/render/.test(w.document.body.innerHTML), /src="data:image\/png/.test(w.document.body.innerHTML)] },
-  { url: 'https://niu.wrk.at/Kripo/Employee/detailEmployee.aspx?EmployeeNumberID=1', html: '<h1>Test (8123)</h1><div id="ctl00_main_m_Employee_m_ccEmployeeMain__employeeMain"></div>',
-    expectScripts: ['detailEmployee.js', 'nur8xxx.js'], expectGlobals: ['PNotify', 'ClipboardJS', 'JSZip', 'JSZipUtils', 'saveAs', 'PouchDB'],
-    check: (w) => [!!w.document.querySelector('#template_box'), !!w.document.querySelector('#upload_select_docx'), !!w.document.querySelector('a[rel="modal:open"][href^="niuhelper-res:"]')],
-    after: async (w, probe) => { const jq = probe('jQuery'); const html = await new Promise((r) => jq.get(w.document.querySelector('a[rel="modal:open"]').getAttribute('href')).done(r).fail(() => r('')));
-      return [/Word Vorlagen/.test(html)]; } },
-  { url: 'https://niu.wrk.at/Kripo/Employee/EmployeeDump.aspx', html: '<div id="ctl00_m_Header">h</div><table class="export"><tr><th>DNr</th><th>Name</th></tr><tr><td>8123</td><td>Huber</td></tr></table>',
+    check: (w) => [!!w.document.querySelector('#niuHelperSettingsLink'), !!w.document.querySelector('#f8000wrap'), /NIU-Addon ist derzeit aktiv/.test(w.document.body.innerHTML)] },
+  // Entfernte Module: Dienstplan, Ambulanzen, Dienststatistik, Mitarbeiter Neu, Leitstellen-Kopf
+  { url: 'http://niu/kripo/Ambulances/AmbulancesEdit.aspx?id=5', html: '<h1>Ambulanz</h1>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
+  { url: 'https://niu.wrk.at/Kripo/DutyRosterNH/DutyRoster.aspx', html: '<table></table>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
+  { url: 'https://niu.wrk.at/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=1', html: '<table></table>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
+  { url: 'https://niu.wrk.at/Kripo/Employee/newEmployee.aspx', html: '<div id="ctl00_m_Header">h</div>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
+  { url: 'https://niu.wrk.at/Kripo/external/ControlCenterHead.aspx', html: '<select id="m_ddlEmployee"></select>', expectScripts: ['nur8xxx.js'], expectGlobals: [] },
+  // Mitarbeiter-Detail: Dekret-Hinweis und Kopierbox, keine Word-Vorlage mehr
+  { url: 'https://niu.wrk.at/Kripo/Employee/detailEmployee.aspx?EmployeeNumberID=1',
+    html: '<h1>Test (8123)</h1><div id="ctl00_main_m_Employee_m_ccEmployeeMain__employeeMain"></div><input id="ctl00_main_m_Employee_m_ccEmployeeMain__firstName" value="Anna"><input id="ctl00_main_m_Employee_m_ccEmployeeMain__lastName" value="Huber">' +
+      '<select id="ctl00_main_m_Employee_m_ccEmployeeMain__professionTitle"><option selected>&lt;Berufstitel&gt;</option></select><select id="ctl00_main_m_Employee_m_ccEmployeeMain__preAcademicTitle"><option selected>&lt;Titel&gt;</option></select><select id="ctl00_main_m_Employee_m_ccEmployeeMain__postAcademicTitle"><option selected>&lt;Titel&gt;</option></select>' +
+      '<input id="ctl00_main_m_Employee_m_ccPersonAddress_m_ccAddress0_m_Street" value="Teststraße"><input id="ctl00_main_m_Employee_m_ccPersonAddress_m_ccAddress0_m_StreetNumber" value="1"><input id="ctl00_main_m_Employee_m_ccPersonAddress_m_ccAddress0_m_PostalCode" value="1010"><input id="ctl00_main_m_Employee_m_ccPersonAddress_m_ccAddress0_m_City" value="Wien"><select id="ctl00_main_m_Employee_m_ccPersonAddress_m_ccAddress0_m_Country"><option selected>Österreich</option></select>',
+    expectScripts: ['detailEmployee.js', 'nur8xxx.js'], expectGlobals: ['PNotify', 'ClipboardJS'],
+    check: (w) => [!!w.document.querySelector('#copybox'), /Anna Huber\nTeststraße 1\n1010 Wien\nÖsterreich/.test(w.document.querySelector('#copycontent').value), !w.document.querySelector('#template_box')] },
+  // Liste/Ausdruck: Menue ohne jQuery UI, ohne Dienststatistik-Eintraege
+  { url: 'https://niu.wrk.at/Kripo/Employee/EmployeeDump.aspx', html: '<div id="ctl00_m_Header">h</div><table class="export"><tr><th>DNR</th><th>Name</th><th>Email</th></tr><tr><td>8123</td><td>Huber Anna</td><td>a@example.org</td></tr></table>',
     expectScripts: ['EmployeeDump.js', 'nur8xxx.js'], expectGlobals: ['jQuery', 'PouchDB', 'vex'],
-    tolerate: /reading 'substr'/, // Fixture hat keine Suchparameter-Zeile
-    check: (w) => [!!w.document.querySelector('#menu'), !!w.document.querySelector('#dienstcount li')] },
-  { url: 'https://niu.wrk.at/Kripo/Employee/newEmployee.aspx', html: '<div id="ctl00_m_Header">h</div>',
-    expectScripts: ['newEmployee.js', 'nur8xxx.js'], expectGlobals: ['jQuery'],
-    check: (w) => [!!w.document.querySelector('#freiednrall')] },
-  { url: 'https://niu.wrk.at/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=1', html: '<table></table>',
-    expectScripts: ['EmployeeDutyStatistic.js', 'nur8xxx.js'], expectGlobals: ['Chartist'] },
-  { url: 'https://niu.wrk.at/Kripo/Today/Today.aspx', html: '<table></table>',
-    expectScripts: ['today.js', 'nur8xxx.js'], expectGlobals: ['ics', 'createCalendar', 'saveAs'] },
+    check: (w) => [!!w.document.querySelector('#menu'), !!w.document.querySelector('#grundkurse'), !w.document.querySelector('#rddienste'), !w.document.querySelector('#pflichtfortbildungen'),
+      !!w.document.querySelector('button#memo_alle_selektiert'), !!w.document.querySelector('#datatable tfoot .footer_input')],
+    after: async (w) => { w.document.querySelector('#menu .menu-title').click(); return [w.document.querySelector('#menu > li').classList.contains('open')]; } },
+  // Startseite: nur noch Kurs-Export
+  { url: 'https://niu.wrk.at/Kripo/Today/Today.aspx',
+    html: '<table id="ctl00_main_m_CourseList__CourseTable"><tr><td>h</td></tr><tr><td>h2</td></tr><tr><td>K123</td><td><a class="CourseTitel" href="/Kripo/Kufer/CourseDetail.aspx?CourseID=K123">Kurs A</a></td><td>Mo, 05.10.2026 08:00</td><td>Mo, 05.10.2026 16:00</td><td>LV</td></tr></table>',
+    expectScripts: ['today.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
+    check: (w) => [/calendar\/render/.test(w.document.body.innerHTML), /Nottendorfergasse/.test(w.document.body.innerHTML), w.document.querySelector('#ctl00_main_m_CourseList__CourseTable a').target === 'wrk_todayDetail'] },
   { url: 'https://niu.wrk.at/Kripo/Kufer/SearchCourse.aspx', html: '<table></table>',
-    expectScripts: ['SearchCourse.js', 'nur8xxx.js'], expectGlobals: ['moment', 'PouchDB'],
+    expectScripts: ['SearchCourse.js', 'nur8xxx.js'], expectGlobals: ['moment'],
     tolerate: /ungültige anzahl an spalten/ }, // Fixture hat keine Kurstabelle
+  { url: 'https://niu.wrk.at/Kripo/Kufer/CourseDetail.aspx?CourseID=K1', html: '<h1>Kurs</h1><h5>K1 - Test</h5><table class="MessageTable"><tr></tr><tr></tr></table>',
+    expectScripts: ['CourseDetail.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
+    check: (w) => [!w.document.querySelector('#person_autocomplete')] },
   { url: 'https://niu.wrk.at/df/memo/Memo_last.asp?x=1', html: '<table></table>', expectScripts: ['memo_last.js'], expectGlobals: ['PouchDB'] },
   { url: 'https://niu.wrk.at/df/spezialdiensterfassung/unterschreiben.asp', html: '<table><tr><th class="th">OK</th></tr></table>',
     expectScripts: ['spezialdienstUnterschreiben.js'], expectGlobals: ['jQuery'], check: (w) => [!!w.document.querySelector('button.everyone')] },
-  { url: 'https://intranet.wrk.at/confluence/pages/viewpage.action?spaceKey=VFM&title=Bescheiderstellung', html: '<div id="main-content"></div><div id="breadcrumbs"></div>',
-    expectScripts: ['vfm-bescheiderstellung.js', 'viewpage.action.js'], expectGlobals: ['Docxtemplater', 'JSZip'],
-    check: (w) => [!!w.document.querySelector('#generatebutton')] },
+  { url: 'https://niu.wrk.at/TNG/SpezialdienstErfassung/Spezialdiensteingabe.asp', html: '<form><input name="Datum"><input name="Stundenbis"><input name="Minutenbis"><input type="checkbox" name="ListeEingabe"></form>',
+    expectScripts: ['Spezialdiensteingabe.js'], expectGlobals: ['jQuery'], check: (w) => [/\d{2}\.\d{2}\.\d{4}/.test(w.document.querySelector('input[name=Datum]').value)] },
+  { url: 'https://intranet.wrk.at/confluence/pages/viewpage.action?spaceKey=VFM&title=Bescheiderstellung', html: '<div id="main-content"></div>', expectScripts: [], expectGlobals: [] },
   { url: 'https://niu.wrk.at/Kripo/Header.aspx#niu-helper-settings', html: '<span id="pageTitle">NIU</span>',
     expectScripts: ['Header.js', 'header-extras.js', 'nur8xxx.js', 'settings.js'], expectGlobals: [],
-    check: (w) => [w.document.title.includes('Einstellungen'), w.document.querySelectorAll('input').length === 5] },
+    check: (w) => [w.document.title.includes('Einstellungen'), w.document.querySelectorAll('input').length === 3] },
   { url: 'https://niu.wrk.at/irgendwas/anderes.aspx', html: '', expectScripts: [], expectGlobals: [] },
 ];
 

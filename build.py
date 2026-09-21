@@ -29,15 +29,13 @@ US = ROOT / "userscript"
 OUT = ROOT / "dist" / "niu-little-helper.user.js"
 
 # Userscript-Version = Extension-Version + eigener Zähler
-US_REVISION = 3
+US_REVISION = 1
 
 # Globale Namen, die die Bibliotheken bereitstellen und die die Content-Scripts
 # als nackte Bezeichner verwenden.
 EXPORTS = [
     # ermittelt mit test/exports-scan.js
-    "jQuery", "$", "moment", "PouchDB", "createCalendar", "XLSX", "Spinner",
-    "saveAs", "PNotify", "ClipboardJS", "Docxtemplater", "JSZip", "JSZipUtils",
-    "Chartist", "vex", "ics",
+    "jQuery", "$", "moment", "PouchDB", "createCalendar", "PNotify", "ClipboardJS", "vex",
 ]
 
 # Dateien, die nur Definitionen enthalten und immer im gemeinsamen Scope liegen
@@ -94,8 +92,8 @@ def patch_source(rel, text):
     """Kleine, gezielte Anpassungen am Original-Code."""
     if rel == "src/content_scripts/lib/staff-lib.js":
         n = text.count('"https://niu.wrk.at/')
-        if n != 17:
-            raise SystemExit("staff-lib.js: %d statt 17 NIU-URLs gefunden - Patch prüfen" % n)
+        if n != 8:
+            raise SystemExit("staff-lib.js: %d statt 8 NIU-URLs gefunden - Patch prüfen" % n)
         text = text.replace('"https://niu.wrk.at/', 'NIU_BASE + "/')
     # <img src=" + getURL(..) + " width=..>  ->  Attribut in Hochkommas (data:-URIs!)
     text = re.sub(r"""<img src=" \+ (chrome\.extension\.getURL\('[^']+'\)) \+ " width""",
@@ -169,7 +167,7 @@ def main():
         ("name", "NIU's little helper (Userscript)"),
         ("namespace", "niu.hannes"),
         ("version", version),
-        ("description", "Userscript-Portierung der Chrome-Erweiterung NIU's little helper (Wiener Rotes Kreuz, NIU) inkl. Filter 'nur 8xxx' im Mitarbeiter-Dropdown."),
+        ("description", "NIU-Addon: Userscript-Portierung von NIU's little helper (Wiener Rotes Kreuz, NIU), reduziert auf Kurse, Mitarbeiter-Verwaltung, Memos und Spezialdienste, plus Filter 'nur 8xxx' im Mitarbeiter-Dropdown."),
         ("author", "Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes"),
         ("homepageURL", "https://github.com/SirFlip/NIU-Addons"),
         ("supportURL", "https://github.com/SirFlip/NIU-Addons/issues"),
@@ -177,8 +175,6 @@ def main():
         ("downloadURL", "https://github.com/SirFlip/NIU-Addons/releases/latest/download/niu-little-helper.user.js"),
         ("match", "*://niu/*"),
         ("match", "*://niu.wrk.at/*"),
-        ("match", "*://intranet.wrk.at/confluence/display/VFM/Bescheiderstellung*"),
-        ("match", "*://intranet.wrk.at/confluence/pages/viewpage.action*"),
         ("run-at", "document-end"),
         ("grant", "GM.getValue"),
         ("grant", "GM.setValue"),

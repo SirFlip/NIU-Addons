@@ -1,10 +1,10 @@
 {
-  "name": "NIU's litte helper",
-  "short_name": "NIU++",
-  "author": "Gerald Baeck",
-  "description": "Chrome Erweiterung zur einfacheren Bedienung des internen Verwaltungssystems des Wiener Roten Kreuz (NIU).",
-  "version": "0.58.3",
-  "homepage_url": "http://baeck.at",
+  "name": "NIU-Addon",
+  "short_name": "NIU-Addon",
+  "author": "Gerald Baeck und Mitwirkende; Rückbau und Userscript-Portierung: Hannes",
+  "description": "Erweiterung des internen Verwaltungssystems des Wiener Roten Kreuz (NIU): Kurse, Mitarbeiter-Verwaltung, Memos, Spezialdienste. Basiert auf NIU's little helper.",
+  "version": "0.59.0",
+  "homepage_url": "https://github.com/SirFlip/NIU-Addons",
   "options_ui" : {
     "page" : "src/options.html",
     "chrome_style" : true
@@ -16,41 +16,16 @@
   },
   "incognito": "not_allowed",
   "permissions": [
-    "downloads",
     "https://niu.wrk.at/*",
     "http://niu/*",
     "https://niu/*",
-    "https://intranet.wrk.at/*",
-    "storage",
-    "webRequest",
-    "webRequestBlocking"
+    "storage"
   ],
   "web_accessible_resources": [
     "img/*",
-    "/src/webcontent/*",
-    "/templates/*"
+    "/src/webcontent/*"
   ],
-  "background": {
-    "scripts": ["src/background/background.js"]
-  },
   "content_scripts": [
-    {
-      "matches": ["*://*/Kripo/DutyRosterNH/DutyRoster.aspx*"],
-      "js": [
-        "src/definitions.js",
-        "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
-        "js/pouchdb/pouchdb-6.1.2.js",
-        "js/moment/moment.min.js",
-        "js/ouical/ouical.js",
-        "src/content_scripts/lib/var.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/lib/staff-lib.js",
-        "src/content_scripts/DutyRoster.js"
-      ],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
     {
       "matches": ["*://*/df/memo/memo_last.asp*", "*://*/df/memo/Memo_last.asp*"],
       "js": [
@@ -63,7 +38,7 @@
       "all_frames": true,
       "run_at": "document_end"
     },
-	{
+    {
       "matches": ["*://*/df/memo/memo_erinnerung.asp*"],
       "js": [
         "src/definitions.js",
@@ -78,7 +53,6 @@
     {
       "matches": ["*://*/TNG/SpezialdienstErfassung/Spezialdiensteingabe.asp"],
       "js": [
-        "src/definitions.js",
         "js/jquery/jquery.js",
         "src/content_scripts/Spezialdiensteingabe.js"
       ],
@@ -86,83 +60,15 @@
       "run_at": "document_end"
     },
     {
-      "matches": ["*://*/Kripo/Ambulances/AmbulancesEdit.aspx*", "*://*/Kripo/Ambulances/AmbulancesDetail.aspx*"],
-      "css": ["js/jquery-modal/jquery.modal.min.css"],
-      "js": [
-        "js/jquery/jquery.js",
-        "js/jquery-modal/jquery.modal.min.js",
-        "js/moment/moment.min.js",
-        "js/moment/locale/de.js",
-        "js/sheetjs/xlsx.full.min.js",
-        "js/ouical/ouical.js",
-        "js/spin/spin.min.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/lib/var.js",
-        "src/content_scripts/AmbulancesEdit.js"
-      ],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["*://*/Kripo/Ambulances/AmbulancesOpenPositions.aspx*"],
-      "js": [
-        "js/jquery/jquery.js",
-        "src/content_scripts/AmbulancesOpenPositions.js"
-      ],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-    {
       "matches": ["*://*/Kripo/Employee/detailEmployee.aspx*"],
-      "css": [
-        "js/pnotify/pnotify.custom.min.css",
-        "js/jquery-modal/jquery.modal.min.css"
-      ],
+      "css": ["js/pnotify/pnotify.custom.min.css"],
       "js": [
         "src/definitions.js",
         "js/jquery/jquery.js",
-        "js/jquery-modal/jquery.modal.min.js",
         "js/pnotify/pnotify.custom.min.js",
         "js/clipboard/clipboard.min.js",
-        "js/docxtemplater/docxtemplater-latest.min.js",
-        "js/docxtemplater/jszip.min.js",
-        "js/docxtemplater/jszip-utils.min.js",
-        "js/FileSaver/FileSaver.min.js",
-        "js/pouchdb/pouchdb-6.1.2.js",
         "src/content_scripts/lib/var.js",
-        "src/content_scripts/lib/staff-lib.js",
         "src/content_scripts/detailEmployee.js"
-      ],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-	{
-      "matches": ["*://intranet.wrk.at/confluence/display/VFM/Bescheiderstellung*", "*://intranet.wrk.at/confluence/pages/viewpage.action?spaceKey=VFM&title=Bescheiderstellung*"],
-      "css": [
-        "js/jquery-modal/jquery.modal.min.css"
-      ],
-      "js": [
-        "src/definitions.js",
-        "js/jquery/jquery.js",
-        "js/jquery-modal/jquery.modal.min.js",
-        "js/docxtemplater/docxtemplater-latest.min.js",
-        "js/docxtemplater/jszip.min.js",
-        "js/docxtemplater/jszip-utils.min.js",
-        "js/FileSaver/FileSaver.min.js",
-        "src/content_scripts/lib/var.js",
-        "src/content_scripts/intranet.wrk.at/vfm-bescheiderstellung.js"
-      ],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["*://*/Kripo/DutyRoster/EmployeeDutyStatistic.aspx*"],
-      "css": ["js/chart/chartist.min.css"],
-      "js": [
-        "js/jquery/jquery.js",
-        "js/chart/chartist.min.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/EmployeeDutyStatistic.js"
       ],
       "all_frames": true,
       "run_at": "document_end"
@@ -199,14 +105,11 @@
     {
       "matches": ["*://*/Kripo/Kufer/CourseDetail.aspx*"],
       "js": [
-        "src/definitions.js",
         "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
         "js/ouical/ouical.js",
-        "src/content_scripts/lib/staff-lib.js",
         "src/content_scripts/CourseDetail.js"
       ],
-      "css" : ["js/jquery-ui/jquery-ui.css"],
+      "css" : ["js/ouical/ouical.css"],
       "all_frames": true,
       "run_at": "document_end"
     },
@@ -215,7 +118,6 @@
       "js": [
         "src/definitions.js",
         "js/jquery/jquery.js",
-        "js/pouchdb/pouchdb-6.1.2.js",
         "js/datatable/jquery.dataTables.min.js",
         "js/moment/moment.min.js",
         "js/moment/datetime-moment.js",
@@ -231,11 +133,9 @@
       "js": [
         "src/definitions.js",
         "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
         "js/pouchdb/pouchdb-6.1.2.js",
         "js/datatable/jquery.dataTables.min.js",
         "js/vex/vex.combined.min.js",
-        "src/content_scripts/lib/lib.js",
         "src/content_scripts/lib/staff-lib.js",
         "src/content_scripts/EmployeeDump.js"
       ],
@@ -244,48 +144,14 @@
       "run_at": "document_end"
     },
     {
-      "matches": ["*://*/Kripo/external/ControlCenterHead.aspx"],
-      "js": [
-        "src/definitions.js",
-        "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
-        "src/content_scripts/lib/staff-lib.js",
-        "src/content_scripts/ControlCenter.js"
-      ],
-      "css" : ["src/css/style.css"],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-    {
       "matches": ["*://*/Kripo/Today/Today.aspx"],
       "js": [
-        "src/definitions.js",
         "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
-        "js/ics.js/ics.deps.min.js",
-        "js/ics.js/ics.js",
         "js/ouical/ouical.js",
         "src/content_scripts/lib/var.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/lib/staff-lib.js",
         "src/content_scripts/today.js"
       ],
       "css" : ["src/css/style.css", "js/ouical/ouical.css"],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["*://*/Kripo/Employee/newEmployee.aspx"],
-      "js": [
-        "src/definitions.js",
-        "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
-        "js/pouchdb/pouchdb-6.1.2.js",
-        "js/datatable/jquery.dataTables.min.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/lib/staff-lib.js",
-        "src/content_scripts/newEmployee.js"],
-      "css" : ["src/css/style.css", "js/datatable/jquery.dataTables.min.css"],
       "all_frames": true,
       "run_at": "document_end"
     },
@@ -303,24 +169,8 @@
     {
       "matches": ["*://*/df/spezialdiensterfassung/?unterschreiben.asp*","*://*/df/df_no_access.asp", "https://niu.wrk.at/df/spezialdiensterfassung/unterschreiben.asp*"],
       "js":[
-        "src/definitions.js",
         "js/jquery/jquery.js",
-        "js/jquery-ui/jquery-ui.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/lib/staff-lib.js",
         "src/content_scripts/spezialdienstUnterschreiben.js"
-      ],
-      "css" : ["src/css/style.css", "js/datatable/jquery.dataTables.min.css"],
-      "all_frames": true,
-      "run_at": "document_end"
-    },
-    {
-      "matches": ["*://intranet.wrk.at/confluence/pages/viewpage.action*"],
-      "js":[
-        "src/definitions.js",
-        "js/jquery/jquery.js",
-        "src/content_scripts/lib/lib.js",
-        "src/content_scripts/intranet.wrk.at/viewpage.action.js"
       ],
       "css" : ["src/css/style.css"],
       "all_frames": true,

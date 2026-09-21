@@ -4,19 +4,15 @@
   if (location.hash !== '#niu-helper-settings' || window.top !== window.self) return;
 
   var fields = [
-    { key: STORAGE_KEY_KUERZEL, type: 'text', def: '', title: 'Kürzel',
-      label: 'Persönliches Kürzel – wird im Bemerkungsfeld bei Ambulanzen, Ausbildungen etc. verwendet.' },
     { key: STORAGE_KEY_SEARCH_COURSE_ALWAYS_SEARCH, type: 'checkbox', def: DEFAULT_SEARCH_COURSE_ALWAYS_SEARCH, title: 'Kurssuche für zukünftige Kurse',
       label: 'Beim Aufruf der Kurssuche automatisch alle Kurse bis ein Jahr in die Zukunft anzeigen.' },
     { key: STORAGE_KEY_CACHE_ACTIVE, type: 'checkbox', def: DEFAULT_CACHE_ACTIVE, title: 'Cache',
       label: 'Temporäres Zwischenspeichern der NIU-Anfragen im lokalen Speicher (Empfehlung: Ja)' },
-    { key: STORAGE_KEY_DF_EXP, type: 'checkbox', def: DEFAULT_DF_EXP, title: 'Optionale Funktionen',
-      label: 'Autocomplete-Felder im Dienstplan' },
-    { key: STORAGE_KEY_DEKRET_ALERT, type: 'checkbox', def: DEFAULT_DEKRET_ALERT, title: null,
+    { key: STORAGE_KEY_DEKRET_ALERT, type: 'checkbox', def: DEFAULT_DEKRET_ALERT, title: 'Mitarbeiter-Detailseite',
       label: 'Hinweis für nicht ausgefolgte Dekrete' }
   ];
 
-  document.title = "NIU's little helper – Einstellungen";
+  document.title = "NIU-Addon – Einstellungen";
   var body = document.body || document.documentElement.appendChild(document.createElement('body'));
   body.innerHTML = '';
   body.style.cssText = 'font-family:Segoe UI,Arial,sans-serif;font-size:14px;background:#f4f4f4;color:#222;margin:0;padding:2em;';
@@ -26,7 +22,7 @@
   body.appendChild(box);
 
   var h = document.createElement('h2');
-  h.textContent = "NIU's little helper – Einstellungen";
+  h.textContent = "NIU-Addon – Einstellungen";
   h.style.marginTop = '0';
   box.appendChild(h);
 
