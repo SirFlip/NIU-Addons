@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NIU's little helper (Userscript)
 // @namespace    niu.hannes
-// @version      0.59.0.7
+// @version      0.59.0.8
 // @description  NIU-Addon: Userscript-Portierung von NIU's little helper (Wiener Rotes Kreuz, NIU), reduziert auf Kurse, Mitarbeiter-Verwaltung, Memos und Spezialdienste, plus Filter 'nur 8xxx' im Mitarbeiter-Dropdown.
 // @author       Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes
 // @homepageURL  https://github.com/SirFlip/NIU-Addons
@@ -29,7 +29,7 @@
 // Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).
 
 (function () {
-var __VERSION = "0.59.0.7";
+var __VERSION = "0.59.0.8";
 var jQuery, $, moment, PouchDB, createCalendar, PNotify, ClipboardJS, vex;
 var __RES = {
   "img/addCal.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAARCAYAAADQWvz5AAAAAXNSR0IArs4c6QAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAATVJREFUOBGtU0FOwzAQjFPTBNETh4griBtXvlDxA96AxHuQeAM/QP0CUj+A4AeckEjapstM8FrO0iiKwNLWuzPr6XrXyTKzjorijmbgGA7xPmYER7LswmJpPMS7kHTsi+Iewacmwn9TX4VSLPiLXdM8gP+a4acTwV7BtrATGFfq/yB9jHyVe3+1b9t1XpblGYGQqTvD1A90D1O+okauGX/d/02oNzU2cEpl6TCiEEW2TfNohXD/c2J1Xb9bjm9KxUav1orc0KyIjWNFlmAlO5FL/OOCHN7Z0jv3eqiyjrcCGlME/lJj+sAY/roiwcGK8GJX4Ff63R3qHwV0jfZIE8f2WBF7oRMyh54Zz8L0Ug5X7fpHDFNH0nx+65y7pj91ichLu9k8dUI8TLHcudMpQnuRD4rwzDf+tlv83c+fwAAAAABJRU5ErkJggg==",
@@ -498,28 +498,43 @@ function getOwnDNRsNotCached() {
     });
 }
 
+// Die Memo-Seiten (df/memo/*.asp) arbeiten mit ISO-8859-1. Ein Formular wuerde die Felder daher als
+// Latin-1-Bytes senden; das bilden wir hier nach. Zeichen ausserhalb von Latin-1 (Euro, typografische
+// Anfuehrungszeichen, Gedankenstrich ...) werden ersetzt, sonst kaemen sie kaputt an.
+var LATIN1_REPLACEMENTS = {
+  '\u20AC': 'EUR', '\u201E': '"', '\u201C': '"', '\u201D': '"', '\u2018': "'", '\u2019': "'", '\u201A': "'",
+  '\u2013': '-', '\u2014': '-', '\u2026': '...', '\u2022': '*', '\u00A0': ' '
+};
+function encodeLatin1(str) {
+  var out = "";
+  String(str === undefined || str === null ? "" : str).split("").forEach(function (ch) {
+    var c = ch.charCodeAt(0);
+    if (c < 128) { out += encodeURIComponent(ch); }
+    else if (c <= 255) { out += "%" + c.toString(16).toUpperCase(); }
+    else if (LATIN1_REPLACEMENTS[ch] !== undefined) { out += encodeURIComponent(LATIN1_REPLACEMENTS[ch]); }
+    else { out += "%3F"; }  // "?"
+  });
+  return out;
+}
+
 function writeMemo(MemoObj) {
-  var post = {};
-
-  post["Memodate"] = MemoObj["memodate"];
-  if (MemoObj["memoreminder"] !== undefined) {
-    post["Erinnerung"] = MemoObj["memoreminder"];
+  var post = [];
+  post.push(["Memodate", MemoObj["memodate"]]);
+  if (MemoObj["memoreminder"] !== undefined && MemoObj["memoreminder"] !== "") {
+    post.push(["Erinnerung", MemoObj["memoreminder"]]);
   }
+  post.push(["Memo_neu", "Memo neu"]);
+  post.push(["DNR", MemoObj["dnr"]]);
+  post.push(["verfasser", MemoObj["dnrself"]]);
+  post.push(["Memotext", MemoObj["memotext"]]);
 
-
-  post["Memo_neu"] = "Memo+neu";
-  post["DNR"] = MemoObj["dnr"]
-  post["verfasser"] = MemoObj["dnrself"];
-
-  var formdatastring = Object.entries(post).map(([k, v]) => `${k}=${v}`).join('&');  //erstelle eine parameterliste param1=etwas&param2=text
-  formdatastring = formdatastring + "&Memotext=" + escape(MemoObj["memotext"]); //Verwende nur bei memotext escape und füge den Parameter an
+  var formdatastring = post.map(function (kv) { return kv[0] + "=" + encodeLatin1(kv[1]); }).join("&");
   return $.ajax({
     url: NIU_BASE + "/df/memo/memo_Neu.asp",
     data: formdatastring,
     type: "POST",
     contentType: "application/x-www-form-urlencoded"
   });
-
 }
 
 /*
@@ -762,7 +777,7 @@ function kommandoLinks(dnr, ids, inline) {
     ['Fahrscheingeld', '/df/fahrscheingeld/entschaedigung/entschaedigung.asp?DienstNr=' + dnr],
     ['Uniform', '/Kripo/Employee/UniformList.aspx?EmployeeId=' + ids.EID],
     ['Schl&uuml;ssel', '/Kripo/Employee/IssuedKeys.aspx?EmployeeId=' + ids.EID],
-    ['Memo', '/df/memo/memo_eingeben.asp?DienstNr=' + dnr],
+    ['Memo', '/df/memo/memo_eingeben.asp?EmployeeID=' + ids.EID + '&EmployeeNumberID=' + ids.ENID],  // DienstNr reicht NIU nicht mehr
     ['Ausbildung', '/Kripo/Kufer/SearchCourse.aspx?EmployeeId=' + ids.EID],
     ['LV Statistik', '/Kripo/Employee/LVStatistic.aspx?EmployeeId=' + ids.EID],
     ['Statistik', '/Kripo/DutyRoster/EmployeeDutyStatistic.aspx?EmployeeNumberID=' + ids.ENID],

@@ -431,3 +431,6 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
   Fallback DOM-Eintrag mit `target="main"`); Kurssuche wählt „Nur abgeschlossene Kurse“ beim ersten Aufruf ab.
 - 0.59.0.6: Datenblatt-Abfrage wirft bei Mitarbeitern ohne E-Mail/Foto keinen Fehler mehr (ML2, P10, P12–P15, P18);
   Autor-Filter in Memo LAST (ML1) vergleicht nur die Autor-Zelle; `extension/` auf den Build-Bedarf reduziert.
+- 0.59.0.8: Sammel-Memo (P3) kodiert alle Felder als ISO-8859-1 (Zeichensatz der Memo-Seiten), Zeichen außerhalb
+  werden ersetzt (€ → EUR, typografische Anführungszeichen → "); Kommando-Link „Memo“ (P16, ML3) nutzt EmployeeID +
+  EmployeeNumberID, weil NIU die Dienstnummer dort nicht mehr akzeptiert.
