@@ -49,6 +49,12 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   const has = (n) => { try { return typeof probe(n) !== 'undefined'; } catch (e) { return false; } };
   t('staff-lib: entfernte Funktionen sind weg', !has('getKuerzel') && !has('calculateDutyStatistic') && !has('makeEmployeeSearchField'));
   t('NIU_BASE folgt dem Host (http://niu)', probe('NIU_BASE') === 'http://niu');
+  // Datenblatt-Parser: ohne mailto-Link und ohne Foto kein Fehler, mit Link wird die Adresse gelesen
+  const parse = probe('parseEmployeeDataSheet');
+  const ohne = parse('<div><input id="ctl00_main_m_Employee_m_ccEmployeeMain__firstName" value="Anna"><div class="PermissionRow"><span class="PermissionType">SAN</span><span class="PermissionName">RS</span><span class="PermissionCheckbox"><input type="checkbox"></span></div></div>');
+  t('Datenblatt: ohne E-Mail leer statt Fehler', ohne.Email === '' && ohne.FotoURL === '' && ohne.Vorname === 'Anna' && ohne.PermissionArray.length === 1 && ohne.PermissionArray[0].revoked === false && ohne.istGast === false);
+  const mit = parse('<div><a href="mailto:a@example.org">Mail</a><img id="ctl00_main_m_Employee_m_ccEmployeeMain__picture" src="/img/unknown.png"></div>');
+  t('Datenblatt: E-Mail und Foto gelesen', mit.Email === 'a@example.org' && mit.FotoURL.includes('unknown'));
   // runWithLimit: hoechstens 2 gleichzeitig, Ergebnisse in Reihenfolge, Fehler ergeben undefined
   const rwl = probe('runWithLimit'); let running = 0, peak = 0;
   const res = await rwl([1, 2, 3, 4, 5], 2, (x) => new Promise((r, j) => { running++; peak = Math.max(peak, running); setTimeout(() => { running--; x === 3 ? j(new Error('x')) : r(x * 10); }, 15); }));

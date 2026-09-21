@@ -227,55 +227,46 @@ function getEmployeeDataSheet(empNID) {
   return getFromCache("datasheetv5_", empNID, { 'empNID': empNID }, getEmployeeDataSheetNotCached);
 }
 
-function getEmployeeDataSheetNotCached(args) {
+// Datenblatt aus dem HTML von detailEmployee.aspx lesen (reine Funktion, testbar)
+function parseEmployeeDataSheet(data) {
   var dict = {};
-  var empNID = args.empNID;
+  var $d = $(data);
 
-  return $.get("https://niu.wrk.at/Kripo/Employee/detailEmployee.aspx?EmployeeNumberID=" + empNID)
+  dict["Vorname"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeMain__firstName").val() || "";
+  dict["Nachname"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeMain__lastName").val() || "";
+  dict["istGast"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeMain__type_3").prop("checked") === true;
+  dict["Dienstgrad"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeMain__rank option:selected").text();
+  dict["FotoURL"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeMain__picture").attr("src") || "";
+  dict["Geburtstag"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeExtention__birthday_m_Textbox").val() || "";
+  dict["Ersteintritt"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeExtention__firstEntry_m_Textbox").val() || "";
+  dict["TelNummer"] = $d.find("#ctl00_main_m_Employee_m_ccPersonContact_m_ccContact0_m_NumberLabel").text();
+  // nicht jeder Mitarbeiter hat eine E-Mail: dann leer statt Fehler
+  var mail = $d.find("a[href*='mailto']").first().attr("href");
+  dict["Email"] = mail ? mail.replace(/^mailto:/i, "").trim() : "";
+  dict["ADuser"] = $d.find("#ctl00_main_m_Employee_m_ccEmployeeExtention_m_Employee > tbody > tr > td:contains('Wrk.at')").text();
 
-    .then(function (data) {
-
-      dict["Vorname"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeMain__firstName").val();
-      dict["Nachname"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeMain__lastName").val();
-      dict["istGast"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeMain__type_3").prop("checked");
-      dict["Dienstgrad"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeMain__rank option:selected").text();
-      dict["FotoURL"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeMain__picture").attr("src");
-      dict["Geburtstag"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeExtention__birthday_m_Textbox").val();
-      dict["Ersteintritt"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeExtention__firstEntry_m_Textbox").val();
-      dict["TelNummer"] = $(data).find("#ctl00_main_m_Employee_m_ccPersonContact_m_ccContact0_m_NumberLabel").text();
-      dict["Email"] = $(data).find("a[href*='mailto']").attr("href").replace("mailto:", "");
-      dict["ADuser"] = $(data).find("#ctl00_main_m_Employee_m_ccEmployeeExtention_m_Employee > tbody > tr > td:contains('Wrk.at\')").text();
-
-      var permArray = [];
-
-      $(data).find(".PermissionRow").each(function () {
-
-        var permDict = {};
-
-        permDict["typ"] = $(this).find(".PermissionType").text();
-        permDict["permission"] = $(this).find(".PermissionName").text();
-
-        permDict["revoked"] = $(this).find(".PermissionCheckbox").find("input").is(':checked');
-
-        permArray.push(permDict);
-
-
-      });
-
-      dict["PermissionArray"] = permArray;
-
-      dict["AmpelCode"] = "";
-
-      $(data).find(".PermissionQualificationIcon").each(function () {
-        var amphtml = this.outerHTML;
-        if ($(amphtml).find('img').length) { dict["AmpelCode"] += amphtml; }
-      });
-
-      return dict;
-
+  var permArray = [];
+  $d.find(".PermissionRow").each(function () {
+    permArray.push({
+      typ: $(this).find(".PermissionType").text(),
+      permission: $(this).find(".PermissionName").text(),
+      revoked: $(this).find(".PermissionCheckbox").find("input").is(':checked')
     });
+  });
+  dict["PermissionArray"] = permArray;
 
+  dict["AmpelCode"] = "";
+  $d.find(".PermissionQualificationIcon").each(function () {
+    var amphtml = this.outerHTML;
+    if ($(amphtml).find('img').length) { dict["AmpelCode"] += amphtml; }
+  });
 
+  return dict;
+}
+
+function getEmployeeDataSheetNotCached(args) {
+  return $.get("https://niu.wrk.at/Kripo/Employee/detailEmployee.aspx?EmployeeNumberID=" + args.empNID)
+    .then(parseEmployeeDataSheet);
 }
 
 function checkCourseAttendance(empID, courseDict) {

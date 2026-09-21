@@ -5,16 +5,6 @@
   "description": "Erweiterung des internen Verwaltungssystems des Wiener Roten Kreuz (NIU): Kurse, Mitarbeiter-Verwaltung, Memos, Spezialdienste. Basiert auf NIU's little helper.",
   "version": "0.59.0",
   "homepage_url": "https://github.com/SirFlip/NIU-Addons",
-  "options_ui" : {
-    "page" : "src/options.html",
-    "chrome_style" : true
-  },
-  "icons": {
-    "16": "icons/niu16.png",
-    "48": "icons/niu48.png",
-    "128": "icons/niu128.png"
-  },
-  "incognito": "not_allowed",
   "permissions": [
     "https://niu.wrk.at/*",
     "http://niu/*",

@@ -10,7 +10,7 @@ $("th:contains('Memo über')").each(function( index ) {
 
   var tableObj = this;
 
-  var MemoAuthorName = $(this).closest("tbody").children("tr:nth-child(2)").children("th:nth-child(1)").text().trim();
+  var MemoAuthorName = memoAuthor($(this).closest("table"));
 
   var MemoAuthorOption = new Option(MemoAuthorName, MemoAuthorName);
   $(MemoAuthorOption).html(MemoAuthorName);
@@ -59,14 +59,19 @@ select.html(select.find('option').sort(function(x, y) {
 }))
 select.val(0);
 
+// Autor eines Memo-Blocks = erste Zelle der zweiten Kopfzeile (nicht der ganze Text, sonst trifft ein
+// Autorname auch, wenn er nur im Memotext oder als betroffene Person vorkommt)
+function memoAuthor(table) {
+  return $(table).find("tbody > tr:nth-child(2) > th:nth-child(1)").first().text().trim();
+}
+
 $("#authorfilter").change(function () {
   var selVal = $(this).val();
-  if(selVal == "0") {
-    $("body > table, body > table + br").show();
-  } else {
-    $("body > table, body > table + br").css("display", "none");
-    $("body > table:contains('" + selVal + "'), body > table:contains('" + selVal + "') + br").show();
-  }
+  $("body > table").each(function () {
+    var show = (selVal == "0") || memoAuthor(this) === selVal;
+    $(this).toggle(show);
+    $(this).next("br").toggle(show);
+  });
 });
 
 });

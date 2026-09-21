@@ -429,3 +429,5 @@ Confluence anpassen bzw. auf „kein Modul startet“ umstellen.
   mehr ab; GitHub-Workflow baut und testet bei jedem Push.
 - Neu in 0.59.0.5: Sidebar-Eintrag „Kurssuche (NIU)“ unter „Ausbildung“ (`menu.js`, über die Dynatree-API der Seite,
   Fallback DOM-Eintrag mit `target="main"`); Kurssuche wählt „Nur abgeschlossene Kurse“ beim ersten Aufruf ab.
+- 0.59.0.6: Datenblatt-Abfrage wirft bei Mitarbeitern ohne E-Mail/Foto keinen Fehler mehr (ML2, P10, P12–P15, P18);
+  Autor-Filter in Memo LAST (ML1) vergleicht nur die Autor-Zelle; `extension/` auf den Build-Bedarf reduziert.

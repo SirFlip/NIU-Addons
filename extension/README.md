@@ -1,6 +1,8 @@
 > **Hinweis:** Dieses README beschreibt die Original-Extension. Im Rahmen der Userscript-Portierung
 > (siehe ../README.md und ../FUNKTIONEN.md) wurden Dienstplan, Ambulanzen, Dienststatistik,
 > Kursanmeldung, Word-Vorlagen, Mitarbeiter Neu und die Confluence-Erweiterungen entfernt.
+> Der Ordner enthält nur noch, was `build.py` braucht (manifest.json, js/, src/, img/); Store-Build,
+> Optionsseite und Icons der Chrome-Extension wurden entfernt.
 
 # NIU's little helper
 Chrome Erweiterung zur einfacheren Bedienung des internen Verwaltungssystems des Wiener Roten Kreuz ([NIU](https://niu.wrk.at/)).

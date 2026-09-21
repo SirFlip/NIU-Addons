@@ -43,7 +43,13 @@ const cases = [
   { url: 'https://niu.wrk.at/Kripo/Kufer/CourseDetail.aspx?CourseID=K1', html: '<h1>Kurs</h1><h5>K1 - Test</h5><table class="MessageTable"><tr></tr><tr></tr></table>',
     expectScripts: ['CourseDetail.js', 'nur8xxx.js'], expectGlobals: ['createCalendar'],
     check: (w) => [!w.document.querySelector('#person_autocomplete')] },
-  { url: 'https://niu.wrk.at/df/memo/Memo_last.asp?x=1', html: '<table></table>', expectScripts: ['memo_last.js'], expectGlobals: ['PouchDB'] },
+  { url: 'https://niu.wrk.at/df/memo/Memo_last.asp?x=1',
+    html: '<form></form><table id="m1"><tbody><tr><th>Memo über Test Anna (8123)</th></tr><tr><th>Autor Eins</th></tr><tr><td>Text erwähnt Autor Zwei</td></tr></tbody></table><br>' +
+      '<table id="m2"><tbody><tr><th>Memo über Test Bernd (8124)</th></tr><tr><th>Autor Zwei</th></tr><tr><td>Text</td></tr></tbody></table><br>',
+    expectScripts: ['memo_last.js'], expectGlobals: ['PouchDB'],
+    check: (w) => [w.document.querySelectorAll('#authorfilter option').length === 3, !!w.document.querySelector('#m1 a[id^=mailButton]'), !!w.document.querySelector('#m2 a[id^=gearButton]')],
+    after: async (w) => { const sel = w.document.querySelector('#authorfilter'); sel.value = 'Autor Zwei'; sel.dispatchEvent(new w.Event('change'));
+      return [w.document.getElementById('m1').style.display === 'none', w.document.getElementById('m2').style.display !== 'none']; } },
   { url: 'https://niu.wrk.at/df/spezialdiensterfassung/unterschreiben.asp', html: '<table><tr><th class="th">OK</th></tr></table>',
     expectScripts: ['spezialdienstUnterschreiben.js'], expectGlobals: ['jQuery'], check: (w) => [!!w.document.querySelector('button.everyone')] },
   { url: 'https://niu.wrk.at/TNG/SpezialdienstErfassung/Spezialdiensteingabe.asp', html: '<form><input name="Datum"><input name="Stundenbis"><input name="Minutenbis"><input type="checkbox" name="ListeEingabe"></form>',
