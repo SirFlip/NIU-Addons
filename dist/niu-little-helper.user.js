@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         NIU's little helper (Userscript)
 // @namespace    niu.hannes
-// @version      0.59.0.9
+// @version      0.59.0.10
 // @description  NIU-Addon: Userscript-Portierung von NIU's little helper (Wiener Rotes Kreuz, NIU), reduziert auf Kurse, Mitarbeiter-Verwaltung, Memos und Spezialdienste, plus Filter 'nur 8xxx' im Mitarbeiter-Dropdown.
 // @author       Gerald Baeck und Mitwirkende; Userscript-Portierung: Hannes
 // @homepageURL  https://github.com/SirFlip/NIU-Addons
@@ -29,7 +29,7 @@
 // Eingebettete Bibliotheken unterliegen ihren jeweiligen Lizenzen (Header bleiben erhalten).
 
 (function () {
-var __VERSION = "0.59.0.9";
+var __VERSION = "0.59.0.10";
 var jQuery, $, moment, PouchDB, createCalendar, PNotify, ClipboardJS, vex;
 var __RES = {
   "img/addCal.png": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAARCAYAAADQWvz5AAAAAXNSR0IArs4c6QAAAVlpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IlhNUCBDb3JlIDUuNC4wIj4KICAgPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4KICAgICAgPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIKICAgICAgICAgICAgeG1sbnM6dGlmZj0iaHR0cDovL25zLmFkb2JlLmNvbS90aWZmLzEuMC8iPgogICAgICAgICA8dGlmZjpPcmllbnRhdGlvbj4xPC90aWZmOk9yaWVudGF0aW9uPgogICAgICA8L3JkZjpEZXNjcmlwdGlvbj4KICAgPC9yZGY6UkRGPgo8L3g6eG1wbWV0YT4KTMInWQAAATVJREFUOBGtU0FOwzAQjFPTBNETh4griBtXvlDxA96AxHuQeAM/QP0CUj+A4AeckEjapstM8FrO0iiKwNLWuzPr6XrXyTKzjorijmbgGA7xPmYER7LswmJpPMS7kHTsi+Iewacmwn9TX4VSLPiLXdM8gP+a4acTwV7BtrATGFfq/yB9jHyVe3+1b9t1XpblGYGQqTvD1A90D1O+okauGX/d/02oNzU2cEpl6TCiEEW2TfNohXD/c2J1Xb9bjm9KxUav1orc0KyIjWNFlmAlO5FL/OOCHN7Z0jv3eqiyjrcCGlME/lJj+sAY/roiwcGK8GJX4Ff63R3qHwV0jfZIE8f2WBF7oRMyh54Zz8L0Ug5X7fpHDFNH0nx+65y7pj91ichLu9k8dUI8TLHcudMpQnuRD4rwzDf+tlv83c+fwAAAAABJRU5ErkJggg==",
@@ -27869,12 +27869,17 @@ $(document).ready(function () {
 __SCRIPTS["userscript/nur8xxx.js"] = function () {
 // Mitarbeiter-Dropdown: Häkchen "nur <Z>xxx" (ehemals eigenes Userscript "NIU – Mitarbeiter-Dropdown nur 8xxx" v1.1).
 // Die Tausenderziffer Z kommt aus den Einstellungen (Standard 8); gefiltert werden nur vierstellige Dienstnummern.
+//
+// Das Dropdown auf der Kommando-Seite hat rund 3000 Einträge. Deshalb wird es nicht Option für Option umgebaut
+// (in Firefox friert die Seite dabei ein), sondern mit einer einzigen innerHTML-Zuweisung aus einem vorbereiteten
+// String; die beiden Varianten (alle / gefiltert) werden einmal berechnet und wiederverwendet.
 (function () {
   'use strict';
 
   const KEY = 'niu_nur8xxx';   // Ein/Aus-Zustand je Browser (localStorage)
   let prefix = DEFAULT_DNR_PREFIX;
   let rx = makeRegex(prefix);
+  let observer = null;
 
   function makeRegex(z) {
     return new RegExp('\\(' + z + '\\d{3}\\)\\s*$');
@@ -27884,7 +27889,23 @@ __SCRIPTS["userscript/nur8xxx.js"] = function () {
     const s = document.getElementById('m_ddlEmployee');
     if (!s || document.getElementById('f8000wrap')) return;
 
-    s._all = Array.from(s.options);
+    // Beide Zustände als HTML vorbereiten (einmalig, ohne das Dropdown anzufassen)
+    const allHtml = s.innerHTML;
+    let filteredHtml = null;
+    let filteredCount = 0;
+    const allCount = s.options.length;
+    function getFilteredHtml() {
+      if (filteredHtml === null) {
+        const parts = [];
+        for (let i = 0; i < s.options.length; i++) {
+          const o = s.options[i];
+          if (rx.test(o.text)) { parts.push(o.outerHTML); }
+        }
+        filteredHtml = parts.join('');
+        filteredCount = parts.length;
+      }
+      return filteredHtml;
+    }
 
     const label = document.createElement('label');
     label.id = 'f8000wrap';
@@ -27893,18 +27914,21 @@ __SCRIPTS["userscript/nur8xxx.js"] = function () {
     cb.type = 'checkbox';
     cb.style.verticalAlign = 'middle';
     label.appendChild(cb);
-    const text = document.createTextNode(' nur ' + prefix + 'xxx');
-    label.appendChild(text);
+    label.appendChild(document.createTextNode(' nur ' + prefix + 'xxx'));
     s.parentNode.insertBefore(label, s.nextSibling);
 
     function apply() {
       const cur = s.value;
-      const keep = cb.checked ? s._all.filter(o => rx.test(o.text)) : s._all;
-      while (s.options.length) s.remove(0);
-      keep.forEach(o => s.add(o));
-      const idx = keep.findIndex(o => o.value === cur);
+      // Eigene Umbauten sollen den Beobachter nicht auslösen
+      if (observer) { observer.disconnect(); }
+      s.innerHTML = cb.checked ? getFilteredHtml() : allHtml;
+      let idx = -1;
+      for (let i = 0; i < s.options.length; i++) {
+        if (s.options[i].value === cur) { idx = i; break; }
+      }
       s.selectedIndex = idx >= 0 ? idx : 0;
-      label.title = keep.length + ' Einträge';
+      label.title = (cb.checked ? filteredCount : allCount) + ' Einträge';
+      if (observer) { observer.observe(document.body, { childList: true, subtree: true }); }
       try { localStorage.setItem(KEY, cb.checked ? '1' : '0'); } catch (e) {}
     }
 
@@ -27922,7 +27946,8 @@ __SCRIPTS["userscript/nur8xxx.js"] = function () {
     if (/^[1-9]$/.test(z)) { prefix = z; rx = makeRegex(z); }
     install();
     // Falls das Dropdown erst später (z. B. per Postback) nachgeladen wird
-    new MutationObserver(install).observe(document.body, { childList: true, subtree: true });
+    observer = new MutationObserver(install);
+    observer.observe(document.body, { childList: true, subtree: true });
   });
 })();
 

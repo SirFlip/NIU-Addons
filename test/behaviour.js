@@ -18,6 +18,14 @@ const wait = (ms) => new Promise((r) => setTimeout(r, ms));
   t('8xxx: nur vierstellige 8000er bleiben', [...sel.options].map(o => o.value).join('') === 'ad');
   cb.checked = false; cb.dispatchEvent(new w.Event('change'));
   t('8xxx: abwählen stellt alle wieder her', sel.options.length === 4);
+  // grosses Dropdown (3000 Eintraege): Umschalten muss schnell bleiben und die Auswahl erhalten
+  let big = ''; for (let i = 0; i < 3000; i++) { const d = 1000 + i * 3; big += '<option value="v' + i + '">Name ' + i + ' (' + d + ')</option>'; }
+  w = load('http://niu/Kripo/external/ControlCenterHead.aspx', '<select id="m_ddlEmployee">' + big + '</select>'); await wait(100);
+  const cbB = w.document.querySelector('#f8000wrap input'); const selB = w.document.getElementById('m_ddlEmployee'); selB.value = 'v2400';
+  const tB = Date.now(); cbB.checked = true; cbB.dispatchEvent(new w.Event('change')); const msOn = Date.now() - tB;
+  const nOn = selB.options.length; const keptSel = selB.value === 'v2400';
+  cbB.checked = false; cbB.dispatchEvent(new w.Event('change'));
+  t('8xxx: 3000 Eintraege gefiltert (' + nOn + ' bleiben, ' + msOn + ' ms), Auswahl erhalten, zurueck auf 3000', nOn > 300 && nOn < 340 && keptSel && selB.options.length === 3000 && selB.value === 'v2400' && msOn < 1500);
   // Einstellungen speichern und in neuer "Seite" wieder laden
   // Reihenfolge der Felder: 0 = Autosuche Kurssuche, 1 = Cache, 2 = Dekret-Hinweis
   w = load('https://niu.wrk.at/Kripo/Header.aspx#niu-helper-settings', ''); await wait(100);
