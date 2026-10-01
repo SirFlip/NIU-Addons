@@ -28,9 +28,11 @@ einmalig `cd test && npm i jsdom@24 fake-indexeddb@5`):
 python3 build.py --test && cd test && node smoke.js && node behaviour.js && node lvstatistic.js
 ```
 
-- `smoke.js`: lädt den Test-Build in jsdom für ~13 NIU-/Intranet-URLs, prüft welche Module starten und welche
-  Bibliotheks-Globals ankommen. Einzelnen Fall prüfen: das `cases`-Array in der Datei kürzen, es gibt keinen Filter-Parameter.
-- `behaviour.js`: Filter „nur 8xxx“, Einstellungsseite, Storage-Shim, `NIU_BASE`.
+- `smoke.js`: lädt den Test-Build in jsdom für ~20 NIU-URLs, prüft welche Module starten, welche Bibliotheks-Globals
+  ankommen und je Seite konkrete DOM-Ergebnisse (Fixtures in `test/fixtures/pages.js`, ohne Personendaten).
+  Einzelnen Fall prüfen: das `cases`-Array in der Datei kürzen, es gibt keinen Filter-Parameter.
+- `behaviour.js`: Filter „nur Zxxx“ (auch mit 3000 Einträgen), Einstellungsseite, Storage-Shim, `NIU_BASE`,
+  Helfer aus staff-lib (`runWithLimit`, `kommandoLinks`, `parseEmployeeDataSheet`, `encodeLatin1`).
 - `lvstatistic.js`: Gruppierung der LV-Statistik gegen `test/fixtures/lvstatistic.js` (echte, namenlose Tabelle).
 - `exports-scan.js`: zeigt, welche Globals jede Bibliothek anlegt; Grundlage für `EXPORTS` in `build.py`, wenn eine Bibliothek dazukommt oder wegfällt.
 
@@ -65,7 +67,7 @@ Aufbau der gebauten Datei (alles in einer IIFE, gemeinsamer Scope wie bei Conten
    `userscript/` an (Einstellungsseite `Header.aspx#niu-helper-settings`, Settings-Link, „nur 8xxx“).
 
 `patch_source()` in `build.py` schreibt in `staff-lib.js` alle `"https://niu.wrk.at/` auf `NIU_BASE + "/` um und
-**bricht ab, wenn es nicht exakt 8 Vorkommen sind**. Wer Funktionen aus staff-lib entfernt, muss den Zähler anpassen.
+**bricht ab, wenn es nicht exakt 7 Vorkommen sind**. Wer Funktionen aus staff-lib entfernt, muss den Zähler anpassen.
 `lib.js` hat eine weitere feste `niu.wrk.at`-URL (shortemployee), die nicht gepatcht wird.
 
 NIU ist ein Frameset (`/Kripo/`): Frames `header` (Header.aspx), `menu` (menu.aspx, Dynatree-Sidebar) und `main`.
@@ -79,6 +81,10 @@ größtes Modul) und die beiden Memo-Scripts. Gemeinsame Helfer dort: `kommandoL
 nutzt `niuBase()`), `runWithLimit` (gedrosselte parallele Abfragen). Einzige schreibende Funktion ist `writeMemo` (Sammel-Memo in EmployeeDump).
 Das Menü „Funktionen“ in EmployeeDump ist reines CSS (`src/css/style.css`, `webcontent/employee_dump_menu.html`);
 jQuery UI gibt es nicht mehr. `NIU_BASE` existiert nur im Userscript-Shim, Code, der es nutzt, braucht einen Fallback.
+
+`userscript/nur8xxx.js` baut das Mitarbeiter-Dropdown (Kommando-Seite: ~3000 Optionen) **abgehängt** per innerHTML um.
+Im sichtbaren Select berechnet Firefox je eingefügter Option Zustand und Stil neu, das fror die Seite ein (Profil:
+98 % in `set Element.innerHTML`). Nicht auf Option-für-Option-Umbau zurückfallen.
 
 ## Repo-spezifische Regeln
 
