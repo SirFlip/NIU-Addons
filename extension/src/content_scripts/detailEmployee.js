@@ -1,6 +1,34 @@
-// Mitarbeiter-Detailseite: Hinweis auf nicht ausgefolgte Dekrete und Kopierbox
-// für Name und Anschrift. Der Brief aus der Word-Vorlage wurde entfernt.
+// Mitarbeiter-Detailseite: Hinweis auf nicht ausgefolgte Dekrete, Kopierbox
+// für Name und Anschrift, Alter neben dem Geburtstag. Der Brief aus der
+// Word-Vorlage wurde entfernt.
+
+// Alter in vollen Jahren aus einem NIU-Datum (dd.mm.yyyy) zum Stichtag; null bei ungültigem Datum
+function alterAusDatum(text, stichtag) {
+  var m = /^\s*(\d{1,2})\.(\d{1,2})\.(\d{4})\s*$/.exec(text || '');
+  if (!m) { return null; }
+  var tag = parseInt(m[1], 10), monat = parseInt(m[2], 10) - 1, jahr = parseInt(m[3], 10);
+  var geb = new Date(jahr, monat, tag);
+  if (geb.getFullYear() !== jahr || geb.getMonth() !== monat || geb.getDate() !== tag) { return null; }
+  var heute = stichtag || new Date();
+  var alter = heute.getFullYear() - jahr;
+  if (heute.getMonth() < monat || (heute.getMonth() === monat && heute.getDate() < tag)) { alter--; }
+  return (alter < 0 || alter > 130) ? null : alter;
+}
+
 $(document).ready(function() {
+
+  // Alter neben dem Geburtstag (Reiter "Sonstiges"); folgt Änderungen im Feld
+  var geburtstag = $('#ctl00_main_m_Employee_m_ccEmployeeExtention__birthday_m_Textbox');
+  if (geburtstag.length) {
+    var alterSpan = $('<span id="niuAlter" style="margin-left:.6em;color:#555;white-space:nowrap;"></span>');
+    (geburtstag.closest('span').length ? geburtstag.closest('span') : geburtstag).after(alterSpan);
+    var zeigeAlter = function() {
+      var a = alterAusDatum(geburtstag.val());
+      alterSpan.text(a === null ? '' : '(' + a + ' Jahre)');
+    };
+    geburtstag.on('change keyup blur', zeigeAlter);
+    zeigeAlter();
+  }
 
   // Alarm für noch nicht ausgefolgte Urkunden und Dekrete
   var load = {};

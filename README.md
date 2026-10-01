@@ -89,7 +89,7 @@ zugehörigen Funktionen wurden entfernt.
   Gaststatus, fehlendes Foto, AD-Benutzer, Kommando-Links),
   Sammel-Mail und Sammel-Memo für ausgewählte Zeilen.
 - **Mitarbeiter Detail:** Hinweis auf nicht ausgefolgte Dekrete, Kopierbox für
-  Name und Anschrift.
+  Name und Anschrift, Alter neben dem Geburtstag.
 - **Mitarbeiter kurz/Zusammenfassung:** VCF- und Foto-Download.
 - **Memos:** Autor-Filter, Mail-Icon und Kommando-Links je Memo.
 - **Spezialdienste:** Eingabeformular vorbefüllen, „alle OK“ beim Unterschreiben.

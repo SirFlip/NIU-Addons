@@ -1,6 +1,6 @@
 # NIU-Addon – Funktionsinventar
 
-Stand: Userscript 0.59.0.10 (1. Oktober 2026). Beschreibt, was das Addon heute tut.
+Stand: Userscript 0.59.0.11 (1. Oktober 2026). Beschreibt, was das Addon heute tut.
 Die Funktions-IDs (T1, K2, P8 …) stammen aus dem ursprünglichen Inventar der
 Original-Extension und werden weiterverwendet, damit alte Verweise gültig bleiben.
 Was seit 0.58 entfernt wurde, steht in Abschnitt 8.
@@ -25,7 +25,7 @@ Legende
 | LV-Statistik `Employee/LVStatistic.aspx` | LVStatistic.js | MA | Zusatztabelle gruppiert nach Dienstart und Funktion | – |
 | Mitarbeiter kurz `Employee/shortemployee.aspx` | shortemployee.js | MA | VCF- und Foto-Download | – |
 | Mitarbeiter Zusammenfassung `Employee/summaryemployee.aspx` | summaryemployee.js | MA | VCF- und Foto-Download mit Dienstnummern, Organigramm | – |
-| Mitarbeiter Detail `Employee/detailEmployee.aspx` | detailEmployee.js | FU | Dekret-Hinweis, Adress-Kopierbox | PNotify, ClipboardJS |
+| Mitarbeiter Detail `Employee/detailEmployee.aspx` | detailEmployee.js | FU | Dekret-Hinweis, Adress-Kopierbox, Alter neben dem Geburtstag | PNotify, ClipboardJS |
 | Mitarbeiter Liste/Ausdruck `Employee/EmployeeDump.aspx` | EmployeeDump.js | FU | Sortierbare Tabelle, Auswertungsspalten, Sammel-Mail, Sammel-Memo | DataTables, vex, PouchDB |
 | Memo LAST `df/memo/memo_last.asp` | memo_last.js | FU | Autor-Filter, Mail-Icon, Kommando-Links | PouchDB |
 | Memo Erinnerung `df/memo/memo_erinnerung.asp` | memo_erinnerung.js | FU | Mail-Icon, Kommando-Links | PouchDB |
@@ -43,7 +43,7 @@ jQuery wird auf allen Seiten geladen, PouchDB nur dort, wo der Cache gebraucht w
 
 | # | Funktion | Was es tut | Zustand |
 |---|---|---|---|
-| H1 | Hinweis „NIU-Addon 0.59.0.10 ist derzeit aktiv.“ | Oben rechts, mit Versionsnummer aus dem Script-Kopf, verlinkt auf das Repo | OK |
+| H1 | Hinweis „NIU-Addon 0.59.0.11 ist derzeit aktiv.“ | Oben rechts, mit Versionsnummer aus dem Script-Kopf, verlinkt auf das Repo | OK |
 | H2 | Link „⚙ Einstellungen“ | Öffnet die Einstellungsseite in neuem Tab; auch über das Tampermonkey-Menü erreichbar | OK |
 | H3 | Einstellungsseite `Header.aspx#niu-helper-settings` | Autosuche Kurssuche (an/aus), Cache (an/aus), Dekret-Hinweis (an/aus), Nummernkreis 1xxx–9xxx | OK |
 | H4 | Häkchen „nur Zxxx“ am Mitarbeiter-Dropdown (`#m_ddlEmployee`) | Filtert auf vierstellige Dienstnummern mit der eingestellten Tausenderziffer (Standard 8), Zustand je Browser gemerkt, überlebt Postbacks. Das Dropdown der Kommando-Seite hat ~3000 Einträge und wird zum Umbauen kurz aus der Seite genommen, sonst friert Firefox ein | OK |
@@ -101,6 +101,7 @@ Umsetzung: bevorzugt über die Dynatree-API der Seite (`unsafeWindow.jQuery`), d
 |---|---|---|---|---|
 | M1 | Hinweis „Dekrete noch nicht ausgefolgt“ | PNotify-Popup beim Laden mit Name und Datum je Dekret; abschaltbar in den Einstellungen; Fallback, falls NIU die Verschachtelung ändert | DOM | OK (ungetestet) |
 | M2 | Adress-Kopierbox | Textarea mit vollem Namen (Titel, Berufstitel) und Anschrift, Kopierbutton | DOM, ClipboardJS | OK |
+| M4 | Alter neben dem Geburtstag | Im Reiter „Sonstiges“ steht rechts neben dem Geburtstag „(NN Jahre)“, folgt Änderungen im Feld; auch in der Kommando-Ansicht (Reiter Details) | DOM | OK |
 
 ### 2.9 Mitarbeiter Liste/Ausdruck – EmployeeDump.js
 
