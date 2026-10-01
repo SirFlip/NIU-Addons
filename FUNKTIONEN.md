@@ -1,6 +1,6 @@
 # NIU-Addon – Funktionsinventar
 
-Stand: Userscript 0.59.0.11 (1. Oktober 2026). Beschreibt, was das Addon heute tut.
+Stand: Userscript 0.60.0 (1. Oktober 2026). Beschreibt, was das Addon heute tut.
 Die Funktions-IDs (T1, K2, P8 …) stammen aus dem ursprünglichen Inventar der
 Original-Extension und werden weiterverwendet, damit alte Verweise gültig bleiben.
 Was seit 0.58 entfernt wurde, steht in Abschnitt 8.
@@ -43,7 +43,7 @@ jQuery wird auf allen Seiten geladen, PouchDB nur dort, wo der Cache gebraucht w
 
 | # | Funktion | Was es tut | Zustand |
 |---|---|---|---|
-| H1 | Hinweis „NIU-Addon 0.59.0.11 ist derzeit aktiv.“ | Oben rechts, mit Versionsnummer aus dem Script-Kopf, verlinkt auf das Repo | OK |
+| H1 | Hinweis „NIU-Addon 0.60.0 ist derzeit aktiv.“ | Oben rechts, mit Versionsnummer aus dem Script-Kopf, verlinkt auf das Repo | OK |
 | H2 | Link „⚙ Einstellungen“ | Öffnet die Einstellungsseite in neuem Tab; auch über das Tampermonkey-Menü erreichbar | OK |
 | H3 | Einstellungsseite `Header.aspx#niu-helper-settings` | Autosuche Kurssuche (an/aus), Cache (an/aus), Dekret-Hinweis (an/aus), Nummernkreis 1xxx–9xxx | OK |
 | H4 | Häkchen „nur Zxxx“ am Mitarbeiter-Dropdown (`#m_ddlEmployee`) | Filtert auf vierstellige Dienstnummern mit der eingestellten Tausenderziffer (Standard 8), Zustand je Browser gemerkt, überlebt Postbacks. Das Dropdown der Kommando-Seite hat ~3000 Einträge und wird zum Umbauen kurz aus der Seite genommen, sonst friert Firefox ein | OK |

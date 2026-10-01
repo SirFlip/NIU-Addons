@@ -37,7 +37,8 @@ python3 build.py --test && cd test && node smoke.js && node behaviour.js && node
 - `exports-scan.js`: zeigt, welche Globals jede Bibliothek anlegt; Grundlage für `EXPORTS` in `build.py`, wenn eine Bibliothek dazukommt oder wegfällt.
 
 Release: `US_REVISION` in `build.py` hochzählen (sonst erkennen Tampermonkey/Userscripts kein Update), bauen, testen,
-committen, Tag `v<extension-version>.<revision>`, dann
+committen, Tag `v<extension-version>.<revision>`; für eine neue Extension-Version die `version` in `extension/manifest.json`
+anheben und `US_REVISION = 0` setzen (Version ist dann z. B. `0.60.0`, Tag `v0.60.0`). Dann
 
 ```bash
 gh release create vX.Y.Z.N dist/niu-little-helper.user.js dist/niu-little-helper.meta.js --title "..." --notes "..."

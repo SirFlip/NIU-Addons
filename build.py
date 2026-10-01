@@ -29,7 +29,7 @@ US = ROOT / "userscript"
 OUT = ROOT / "dist" / "niu-little-helper.user.js"
 
 # Userscript-Version = Extension-Version + eigener Zähler
-US_REVISION = 11
+US_REVISION = 0
 
 # Globale Namen, die die Bibliotheken bereitstellen und die die Content-Scripts
 # als nackte Bezeichner verwenden.
@@ -123,7 +123,8 @@ def inline_css(rel):
 
 def main():
     manifest = json.loads(read("manifest.json"))
-    version = "%s.%d" % (manifest["version"], US_REVISION)
+    # Revision 0 = reine Extension-Version (z. B. 0.60.0), danach 0.60.0.1, 0.60.0.2 ...
+    version = manifest["version"] if US_REVISION == 0 else "%s.%d" % (manifest["version"], US_REVISION)
 
     entries, lib_order, script_order, css_order = [], [], [], []
     for cs in manifest["content_scripts"]:

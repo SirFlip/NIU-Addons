@@ -3,7 +3,7 @@
   "short_name": "NIU-Addon",
   "author": "Gerald Baeck und Mitwirkende; Rückbau und Userscript-Portierung: Hannes",
   "description": "Erweiterung des internen Verwaltungssystems des Wiener Roten Kreuz (NIU): Kurse, Mitarbeiter-Verwaltung, Memos, Spezialdienste. Basiert auf NIU's little helper.",
-  "version": "0.59.0",
+  "version": "0.60.0",
   "homepage_url": "https://github.com/SirFlip/NIU-Addons",
   "permissions": [
     "https://niu.wrk.at/*",
