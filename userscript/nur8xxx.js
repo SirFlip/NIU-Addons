@@ -50,16 +50,27 @@
 
     function apply() {
       const cur = s.value;
+      const html = cb.checked ? getFilteredHtml() : allHtml;
       // Eigene Umbauten sollen den Beobachter nicht auslösen
       if (observer) { observer.disconnect(); }
-      s.innerHTML = cb.checked ? getFilteredHtml() : allHtml;
-      let idx = -1;
-      for (let i = 0; i < s.options.length; i++) {
-        if (s.options[i].value === cur) { idx = i; break; }
+      // Das Select wird abgehängt umgebaut: Firefox berechnet sonst für jede eingefügte Option Zustand und
+      // Stil des sichtbaren Dropdowns neu (im Profil 98 % der Zeit in innerHTML), bei ~3000 Einträgen friert
+      // die Seite ein. Abgehängt ist das eine reine Datenänderung, beim Wiedereinhängen rechnet Firefox einmal.
+      const parent = s.parentNode;
+      const next = s.nextSibling;
+      try {
+        parent.removeChild(s);
+        s.innerHTML = html;
+        let idx = -1;
+        for (let i = 0; i < s.options.length; i++) {
+          if (s.options[i].value === cur) { idx = i; break; }
+        }
+        s.selectedIndex = idx >= 0 ? idx : 0;
+      } finally {
+        parent.insertBefore(s, next);
+        if (observer) { observer.observe(document.body, { childList: true, subtree: true }); }
       }
-      s.selectedIndex = idx >= 0 ? idx : 0;
       label.title = (cb.checked ? filteredCount : allCount) + ' Einträge';
-      if (observer) { observer.observe(document.body, { childList: true, subtree: true }); }
       try { localStorage.setItem(KEY, cb.checked ? '1' : '0'); } catch (e) {}
     }
 
